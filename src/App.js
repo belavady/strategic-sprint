@@ -58,12 +58,12 @@ const P = {
 // Agent definitions
 const AGENTS = [
   { id:"signals",     wave:1, icon:"◈", label:"Market Signals",        sub:"TAM, unit economics, capital environment"              },
-  { id:"competitive", wave:1, icon:"◆", label:"Competitive Scan",      sub:"Positioning map, where you win/lose"                   },
-  { id:"channels",    wave:1, icon:"◇", label:"Channel Audit",         sub:"Acquisition mix, reallocation thesis"                  },
-  { id:"segments",    wave:1, icon:"◊", label:"Segment Whitespace",    sub:"User personas, underserved opportunities"              },
-  { id:"pivot",       wave:2, icon:"◆", label:"GTM Strategy",          sub:"Synthesis of all 4 analysis agents"                    },
+  { id:"competitive", wave:1, icon:"◈", label:"Competitive Scan",      sub:"Positioning map, where you win/lose"                   },
+  { id:"channels",    wave:1, icon:"◈", label:"Channel Audit",         sub:"Acquisition mix, reallocation thesis"                  },
+  { id:"segments",    wave:1, icon:"◈", label:"Segment Whitespace",    sub:"User personas, underserved opportunities"              },
+  { id:"pivot",       wave:2, icon:"◈", label:"GTM Strategy",          sub:"Synthesis of all 4 analysis agents"                    },
   { id:"kpis",        wave:2, icon:"◈", label:"Operating Cadence",     sub:"North Star metric, weekly/monthly/quarterly rhythm"    },
-  { id:"narrative",   wave:2, icon:"◇", label:"Investment Narrative",  sub:"Situation-Complication-Conviction memo"                },
+  { id:"narrative",   wave:2, icon:"◈", label:"Investment Narrative",  sub:"Situation-Complication-Conviction memo"                },
 ];
 const W1 = AGENTS.filter(a=>a.wave===1).map(a=>a.id);
 const W2 = AGENTS.filter(a=>a.wave===2).map(a=>a.id);
@@ -959,14 +959,24 @@ function parseAxesMap(text) {
 function md(text) {
   if (!text) return "";
 
-  // Extract axes maps first
-  const axesMap = parseAxesMap(text);
-  let processed = text;
+// Extract and remove code blocks with maps first
+let processed = text;
+const axesMap = parseAxesMap(text);
+
+if (axesMap) {
+  // Remove everything from first ``` to last ``` that contains map content
+  processed = processed.replace(/```[^\n]*\n([\s\S]*?)```/g, (match, content) => {
+    if (content.includes("AXIS") || content.includes("←") || content.includes("HIGH") || content.includes("LOW")) {
+      return `%%AXES%%${btoa(unescape(encodeURIComponent(axesMap)))}%%AXES%%`;
+    }
+    return match;
+  });
   
-  if (axesMap) {
-    const axesPlaceholder = `%%AXES%%${btoa(unescape(encodeURIComponent(axesMap)))}%%AXES%%`;
-    processed = processed.replace(/AXIS 1 HIGH[\s\S]{1,500}?(AXIS 1 LOW|$)/i, axesPlaceholder);
+  // Also handle inline maps (no code blocks)
+  if (!processed.includes("%%AXES%%")) {
+    processed = processed.replace(/(AXIS[\s\S]{1,500}?AXIS)/i, `%%AXES%%${btoa(unescape(encodeURIComponent(axesMap)))}%%AXES%%`);
   }
+}
 
   // Tables
   processed = processed.replace(/^(\|.+\|\n)(\|[-| :]+\|\n)((?:\|.+\|\n?)+)/gm, (match) => {
@@ -1013,8 +1023,8 @@ function AgentCard({ agent, status, result, index }) {
       {/* Header */}
       <div style={{ 
         background: status === "done" || status === "running" 
-          ? `linear-gradient(135deg, ${P.teal} 0%, ${P.forestSoft} 100%)` 
-          : c.bg, 
+        ? `linear-gradient(135deg, ${P.terra} 0%, ${P.terraSoft} 100%)` 
+        : c.bg,
         padding: "16px 20px", 
         borderBottom: status === "done" || status === "running" ? "none" : `1px solid ${c.border}`,
         display: "flex", 
@@ -1027,7 +1037,7 @@ function AgentCard({ agent, status, result, index }) {
           <div style={{ width: 10, height: 10, borderRadius: "50%", background: c.dot, boxShadow: status==="running" ? `0 0 8px ${c.dot}` : "none" }}/>
           <span style={{ 
             fontSize: status === "done" || status === "running" ? 16 : 14, 
-            fontWeight: 700, 
+            fontWeight: 900, 
             color: status === "done" || status === "running" ? P.white : P.ink, 
             letterSpacing: "0.02em",
             fontFamily: status === "done" || status === "running" ? "'Libre Baskerville',serif" : "inherit"
@@ -1099,14 +1109,23 @@ function AgentCard({ agent, status, result, index }) {
 // Print-only header
 function PrintHeader({ company, date }) {
   return (
-    <div className="print-header" style={{ display: "none" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <div>
-          <span>Strategic Intelligence Sprint</span>
-          <span style={{ marginLeft: 16, fontSize: 12, opacity: 0.85 }}>{company}</span>
+    <div className="print-title-page no-print-on-screen" style={{ display: "none" }}>
+      <div>
+        <div style={{ fontSize: 14, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "#9b8c78", marginBottom: 16 }}>
+          PARALLEL AGENT INTELLIGENCE
         </div>
-        <div style={{ fontSize: 11, opacity: 0.75 }}>
-          {date} · Harsha Belavady
+        <h1 style={{ fontFamily: "'Libre Baskerville',serif", fontSize: 48, fontWeight: 700, color: "#1a3325", margin: 0 }}>
+          StrategySprint
+        </h1>
+        <div style={{ fontSize: 18, color: "#2b2b2b", marginTop: 8, fontWeight: 600 }}>
+          {company}
+        </div>
+        <div className="subtitle" style={{ fontSize: 13, color: "#6b6b6b", marginTop: 32 }}>
+          Built by <strong>Harsha Belavady</strong><br/>
+          7 Parallel Agents · Powered by Claude
+        </div>
+        <div style={{ fontSize: 11, color: "#9a9a9a", marginTop: 16 }}>
+          {date}
         </div>
       </div>
     </div>
@@ -1307,7 +1326,7 @@ export default function App() {
         @keyframes shimmer { 0%{background-position:200% 0}100%{background-position:-200% 0} }
         @keyframes pulse { 0%,100%{opacity:.4}50%{opacity:1} }
         body { margin: 0; }
-        
+        .no-print-on-screen { display: flex !important; }
         @media print {
           @page { size: landscape; margin: 0.6in 0.5in; }
           
@@ -1318,7 +1337,7 @@ export default function App() {
           
           .no-print { display: none !important; }
           button { display: none !important; }
-          
+          .no-print-on-screen { display: flex !important; }
           .print-header { 
             display: block !important;
             border: 2px solid #2a7d6f;
@@ -1335,6 +1354,26 @@ export default function App() {
             font-weight: 700;
           }
           
+          /* Title page - centered */
+.print-title-page {
+  page-break-after: always !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 100vh !important;
+  text-align: center !important;
+}
+
+.print-title-page h1 {
+  font-size: 48pt !important;
+  margin-bottom: 24px !important;
+}
+
+.print-title-page .subtitle {
+  font-size: 14pt !important;
+  margin-top: 32px !important;
+}          
+
           [data-agent] { 
             page-break-before: always !important;
             page-break-inside: avoid !important;
@@ -1401,14 +1440,13 @@ export default function App() {
         }
       `}</style>
 
-      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "40px 24px 80px" }}>
-        {/* Header */}
+     {/* Header */}
         <div style={{ textAlign: "center", marginBottom: 48 }}>
           <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".14em", textTransform: "uppercase", color: P.inkFaint, marginBottom: 12 }}>
             Rapid Intelligence Sprint · Human & AI Powered
           </div>
           <h1 style={{ fontFamily: "'Libre Baskerville',serif", fontSize: 48, fontWeight: 700, color: P.forest, margin: "0 0 14px", lineHeight: 1.1 }}>
-            <span style={{ color: P.forestSoft }}>Advisor</span>Sprint
+            <span style={{ color: P.forestSoft }}>Strategic</span>Analysis
           </h1>
           <div style={{ fontSize: 15, color: P.inkMid, lineHeight: 1.6, maxWidth: 520, margin: "0 auto 6px" }}>
             Tech & Consumer Company Intelligence<br/>
@@ -1491,7 +1529,7 @@ export default function App() {
               <button
                 onClick={runSprint}
                 disabled={!company.trim()}
-                style={{ flex: 1, background: company.trim() ? P.forest : P.sand, color: "white", border: "none", padding: "14px 28px", borderRadius: 3, fontSize: 14, fontWeight: 700, cursor: company.trim() ? "pointer" : "not-allowed", fontFamily: "'Work Sans',sans-serif", letterSpacing: ".03em", transition: "all .2s" }}
+                style={{ flex: 1, background: company.trim() ? P.terra : P.sand, color: "white", border: "none", padding: "14px 28px", borderRadius: 3, fontSize: 14, fontWeight: 700, cursor: company.trim() ? "pointer" : "not-allowed", fontFamily: "'Work Sans',sans-serif", letterSpacing: ".03em", transition: "all .2s" }}
               >
                 {isActive ? "● RUNNING..." : "→ LAUNCH SPRINT"}
               </button>
@@ -1558,7 +1596,7 @@ export default function App() {
               </div>
             ))}
           </div>
-        </>
+        
         )}
 
         {/* Bottom completion section */}
