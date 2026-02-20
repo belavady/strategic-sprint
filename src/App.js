@@ -5,7 +5,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 // NO TABS - Single page with sprint functionality  
 // ═══════════════════════════════════════════════════════
 
-const MOCK_MODE = false;
+const MOCK_MODE = true;
 const GA4_ID = "G-XXXXXXXXXX";
 
 const gaEvent = (name, params = {}) => {
@@ -46,18 +46,24 @@ const W1 = AGENTS.filter(a => a.wave === 1).map(a => a.id);
 const W2 = AGENTS.filter(a => a.wave === 2).map(a => a.id);
 
 const makePrompt = (id, company, ctx, synthCtx) => {
-  const base = `You are senior VC analyst. Memo for Erik Torenberg and a16z partners. Be SHARP and SUBSTANTIVE.`;
-  const research = `Use web search for recent data. Cite source+date or write "estimated based on [method]."`;
-  const rules = `Multiple examples per claim (3-5). Named companies. Quantified trends. Don't invent numbers.`;
+  const base = `You are a strategic analyst. Write tight, analytical narrative - direct analysis, no memo format, no headers with TO/FROM/DATE. Start immediately with ## section headers.`;
+  const research = `Use web search for current 2025-2026 data. Cite sources inline like: "According to Sacra March 2025" or "per TechCrunch July 2025". Include **Sources:** list at end.`;
+  const rules = `Write in connected narrative prose. Multiple concrete examples per claim. Named companies with specific metrics. No bullet points unless listing items. Match the analytical style of professional research reports.`;
 
   const prompts = {
-    signals: `${base}\nAGENT 1/7: MARKET SIGNALS\n${research} ${rules} ${ctx}\nOUTPUT: 800-1000 words.`,
-    competitive: `${base}\nAGENT 2/7: COMPETITIVE\n${research} ${rules} ${ctx}\nOUTPUT: 900-1100 words.`,
-    channels: `${base}\nAGENT 3/7: CHANNELS\n${research} ${rules} ${ctx}\nOUTPUT: 800-1000 words.`,
-    segments: `${base}\nAGENT 4/7: SEGMENTS\n${research} ${rules} ${ctx}\nOUTPUT: 800-1000 words.`,
-    pivot: `${base}\nAGENT 5/7: GTM SYNTHESIS\n${synthCtx || "[Wave 1]"}${research} ${ctx}\nOUTPUT: 1000-1200 words.`,
-    kpis: `${base}\nAGENT 6/7: OPERATING RHYTHM\n${synthCtx || "[Complete]"}${research} ${ctx}\nOUTPUT: 800-1000 words.`,
-    narrative: `${base}\nAGENT 7/7: INVESTMENT MEMO\n${synthCtx || "[Complete]"}${research} ${ctx}\nOUTPUT: 1100-1300 words.`,
+    signals: `${base}\n\nAnalyze market signals for ${company}.\n\n${research}\n${rules}\n\n${ctx}\n\nRequired sections:\n## CATEGORY SNAPSHOT\n## THE WEDGE EXPANDING\n## UNIT ECONOMICS\n## HIDDEN RISK\n## CAPITAL ENVIRONMENT\n## CONTRARIAN INSIGHT\n\nWrite 800-1000 words in narrative format. Start directly with "## CATEGORY SNAPSHOT" - no introduction, no memo header.`,
+    
+    competitive: `${base}\n\nAnalyze competitive landscape for ${company}.\n\n${research}\n${rules}\n\n${ctx}\n\nRequired sections:\n## COMPETITIVE SET\n## WHERE WINS\n## WHERE LOSES\n## SUBSTITUTION RISK\n## FUNDING GAP\n\nWrite 900-1100 words. Start with "## COMPETITIVE SET" immediately.`,
+    
+    channels: `${base}\n\nAnalyze channel strategy for ${company}.\n\n${research}\n${rules}\n\n${ctx}\n\nRequired sections:\n## CURRENT MIX\n## EFFICIENCY\n## REALLOCATION THESIS\n## HIDDEN LEVERAGE\n## CHANNEL RISK\n\nWrite 800-1000 words. Start with "## CURRENT MIX" immediately.`,
+    
+    segments: `${base}\n\nAnalyze customer segments for ${company}.\n\n${research}\n${rules}\n\n${ctx}\n\nRequired sections:\n## CORE SEGMENT\n## UNDERSERVED ADJACENT\n## WHITESPACE\n## SEQUENCING\n## PARETO\n\nWrite 800-1000 words. Start with "## CORE SEGMENT" immediately.`,
+    
+    pivot: `${base}\n\nSynthesize GTM strategy for ${company} using prior analysis.\n\nPrior findings:\n${synthCtx || "[Wave 1 analysis]"}\n\n${research}\n${rules}\n\n${ctx}\n\nRequired sections:\n## SYNTHESIS\n## WORKING: KEEP\n## BROKEN: KILL\n## STRATEGIC BET\n## CAPITAL REALLOCATION\n## RISK\n\nWrite 1000-1200 words. Start with "## SYNTHESIS" immediately.`,
+    
+    kpis: `${base}\n\nDefine operating metrics and rhythm for ${company}.\n\nComplete context:\n${synthCtx || "[All prior analysis]"}\n\n${research}\n${rules}\n\n${ctx}\n\nRequired sections:\n## NORTH STAR METRIC\n## SUPPORTING 1-3 (three supporting metrics)\n## WEEKLY RHYTHM\n## MONTHLY RHYTHM\n## QUARTERLY RHYTHM\n## VANITY TRAP\n\nWrite 800-1000 words. Start with "## NORTH STAR METRIC" immediately.`,
+    
+    narrative: `${base}\n\nWrite investment thesis for ${company}.\n\nComplete analysis:\n${synthCtx || "[All 6 prior agents]"}\n\n${research}\n${rules}\n\n${ctx}\n\nRequired sections:\n## SITUATION\n## COMPLICATION\n## CONVICTION\n## BEAR CASE\n## THESIS SUMMARY\n\nWrite 1100-1300 words. Start with "## SITUATION" immediately.`,
   };
 
   return prompts[id] || "";
