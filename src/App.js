@@ -570,7 +570,7 @@ export default function App() {
           {/* Synopsis Page */}
           <div style={{ pageBreakAfter: "always", padding: "70px 50px 30px 50px" }}>
             <div style={{ textAlign: "center", marginBottom: 25 }}>
-              <h1 style={{ fontFamily: "'Libre Baskerville', serif", fontSize: 32, fontWeight: 700, textTransform: "uppercase", marginBottom: 8, color: "#1a3325", letterSpacing: "0.05em" }}>{company}</h1>
+              <h1 style={{ fontFamily: "'Libre Baskerville', serif", fontSize: 32, fontWeight: 700, marginBottom: 8, color: "#1a3325", letterSpacing: "0.05em" }}>{company.toUpperCase()}</h1>
               <p style={{ fontSize: 12, color: "#6b6b6b", marginBottom: 3 }}>7-Agent Parallel Intelligence Analysis</p>
               <p style={{ fontSize: 10, color: "#9a9a9a" }}>Generated {new Date().toLocaleDateString()} • Powered by Claude</p>
             </div>
