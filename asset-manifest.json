@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/strategic-sprint/static/css/main.e6c13ad2.css",
-    "main.js": "/strategic-sprint/static/js/main.ad097afe.js",
+    "main.js": "/strategic-sprint/static/js/main.dba5252f.js",
     "static/js/453.65d331f2.chunk.js": "/strategic-sprint/static/js/453.65d331f2.chunk.js",
     "index.html": "/strategic-sprint/index.html",
     "main.e6c13ad2.css.map": "/strategic-sprint/static/css/main.e6c13ad2.css.map",
-    "main.ad097afe.js.map": "/strategic-sprint/static/js/main.ad097afe.js.map",
+    "main.dba5252f.js.map": "/strategic-sprint/static/js/main.dba5252f.js.map",
     "453.65d331f2.chunk.js.map": "/strategic-sprint/static/js/453.65d331f2.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.e6c13ad2.css",
-    "static/js/main.ad097afe.js"
+    "static/js/main.dba5252f.js"
   ]
 }
