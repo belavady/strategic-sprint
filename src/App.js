@@ -311,9 +311,9 @@ function md(text) {
     // Extract THE VERDICT
     const verdictMatch = fixedText.match(/\*\*THE VERDICT\*\*\s*\n(.+?)(?=\n◉)/s);
     if (verdictMatch) {
-      html += `<div style="margin-bottom:16px;padding:14px;background:white;border:1px solid #d4724a;border-left:3px solid #d4724a">
-        <div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#d4724a;margin-bottom:5px">THE VERDICT</div>
-        <p style="font-size:11px;line-height:1.5;color:#2b2b2b;margin:0">${verdictMatch[1].trim()}</p>
+      html += `<div style="margin-bottom:12px;padding:11px;background:white;border:1px solid #d4724a;border-left:3px solid #d4724a">
+        <div style="font-size:8px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#d4724a;margin-bottom:4px">THE VERDICT</div>
+        <p style="font-size:10px;line-height:1.4;color:#2b2b2b;margin:0">${verdictMatch[1].trim()}</p>
       </div>`;
     }
     
@@ -327,11 +327,11 @@ function md(text) {
     
     // Wave 1: First 4 sections in 2x2 grid
     if (sections.length >= 4) {
-      html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">';
+      html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:12px">';
       for (let i = 0; i < 4; i++) {
-        html += `<div style="padding:11px;background:white;border:1px solid #3d6b54;border-left:3px solid #3d6b54">
-          <div style="font-size:8px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:#3d6b54;margin-bottom:5px">◉ ${sections[i].title}</div>
-          <p style="font-size:9px;line-height:1.45;color:#4a4a4a;margin:0">${sections[i].content}</p>
+        html += `<div style="padding:9px;background:white;border:1px solid #3d6b54;border-left:3px solid #3d6b54">
+          <div style="font-size:7.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#3d6b54;margin-bottom:4px">◉ ${sections[i].title}</div>
+          <p style="font-size:8.5px;line-height:1.35;color:#4a4a4a;margin:0">${sections[i].content}</p>
         </div>`;
       }
       html += '</div>';
@@ -339,9 +339,9 @@ function md(text) {
     
     // Wave 2: Remaining sections row-wise
     for (let i = 4; i < sections.length; i++) {
-      html += `<div style="margin-bottom:10px;padding:12px;background:white;border:1px solid #3d6b54;border-left:3px solid #3d6b54">
-        <div style="font-size:8px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:#3d6b54;margin-bottom:5px">◉ ${sections[i].title}</div>
-        <p style="font-size:9.5px;line-height:1.5;color:#4a4a4a;margin:0">${sections[i].content}</p>
+      html += `<div style="margin-bottom:8px;padding:10px;background:white;border:1px solid #3d6b54;border-left:3px solid #3d6b54">
+        <div style="font-size:7.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#3d6b54;margin-bottom:4px">◉ ${sections[i].title}</div>
+        <p style="font-size:9px;line-height:1.4;color:#4a4a4a;margin:0">${sections[i].content}</p>
       </div>`;
     }
     
@@ -492,34 +492,35 @@ Your synopsis must tell a STORY with narrative arc:
 
 STRUCTURE:
 
-**THE VERDICT** (70-85 words)
-Open with the single most contrarian insight that reframes thinking about ${company}. Lead with specific data. Make it impossible to ignore.
+**THE VERDICT** (60-70 words MAXIMUM - this is a HARD LIMIT)
+Open with the single most contrarian insight. Lead with specific data. Make it impossible to ignore.
 
 **KEY FINDINGS** (Four sections for Wave 1 in 2x2 grid, two sections for Wave 2 full-width)
 
-Wave 1 sections (45-55 words each - MUST be concise for grid layout):
+Wave 1 sections (35-45 words MAXIMUM per section - HARD LIMIT for grid layout):
 
 ◉ MARKET SIGNALS
-[Most contrarian market insight with 1-2 key metrics - 45-55 words max]
+[Most contrarian market insight with 1-2 key metrics - 35-45 words MAXIMUM]
 
 ◉ COMPETITIVE LANDSCAPE  
-[Hidden competitive reality with competitor names - 45-55 words max]
+[Hidden competitive reality with competitor names - 35-45 words MAXIMUM]
 
 ◉ CHANNELS
-[Channel efficiency insight with CAC data - 45-55 words max]
+[Channel efficiency insight with CAC data - 35-45 words MAXIMUM]
 
 ◉ SEGMENTS
-[Customer segment opportunity with TAM/LTV data - 45-55 words max]
+[Customer segment opportunity with TAM/LTV data - 35-45 words MAXIMUM]
 
-Wave 2 sections (60-70 words each - can be slightly longer as full-width):
+Wave 2 sections (50-60 words MAXIMUM per section - HARD LIMIT):
 
 ◉ GTM & OPERATIONS
-[Synthesize GTM Blueprint + Operating Rhythm: key strategic bet and North Star metric - 60-70 words]
+[Synthesize GTM Blueprint + Operating Rhythm: key strategic bet and North Star metric - 50-60 words MAXIMUM]
 
 ◉ INVESTMENT THESIS
-[From Investment Memo: conviction case and expected outcome with valuation path - 60-70 words]
+[From Investment Memo: conviction case and expected outcome with valuation path - 50-60 words MAXIMUM]
 
-CRITICAL: Keep Wave 1 sections TIGHT (45-55 words) so 2x2 grid fits on page. Wave 2 can be slightly longer.
+CRITICAL: These word limits are HARD MAXIMUMS. Going over will break the page layout. Count your words and stay under limits.
+Total synopsis: 290-350 words MAX.
 
 STYLE REQUIREMENTS:
 
@@ -774,8 +775,8 @@ Start directly with the content. Do NOT include "Here is the synopsis" or explan
               <p style={{ fontSize: 10, color: "#9a9a9a" }}>Generated {new Date().toLocaleDateString()} in {formatTime(elapsed)}</p>
             </div>
 
-            <div style={{ background: "#faf8f4", border: "2px solid #1a3325", borderRadius: 4, padding: "16px 20px", marginBottom: 16 }}>
-              <h2 style={{ fontFamily: "'Libre Baskerville', serif", fontSize: 15, color: "#1a3325", marginBottom: 12, textAlign: "center", borderBottom: "1px solid #9b8c78", paddingBottom: 6 }}>EXECUTIVE SYNOPSIS</h2>
+            <div style={{ background: "#faf8f4", border: "2px solid #1a3325", borderRadius: 4, padding: "14px 18px", marginBottom: 14 }}>
+              <h2 style={{ fontFamily: "'Libre Baskerville', serif", fontSize: 14, color: "#1a3325", marginBottom: 10, textAlign: "center", borderBottom: "1px solid #9b8c78", paddingBottom: 5 }}>EXECUTIVE SYNOPSIS</h2>
               
               {/* Dynamic Synopsis from Agent */}
               {results.synopsis ? (
@@ -812,7 +813,7 @@ Start directly with the content. Do NOT include "Here is the synopsis" or explan
                   </div>
                 </div>
                 
-                <div className="agent-content" style={{ fontSize: 11.5, lineHeight: 1.8, color: "#2b2b2b" }} dangerouslySetInnerHTML={{ __html: md(result) }} />
+                <div className="agent-content" style={{ fontSize: 11.5, lineHeight: 1.8, color: "#2b2b2b", paddingTop: "110px", marginTop: "-104px" }} dangerouslySetInnerHTML={{ __html: md(result) }} />
               </div>
             );
           })}
