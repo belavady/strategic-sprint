@@ -5,7 +5,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 // NO TABS - Single page with sprint functionality  
 // ═══════════════════════════════════════════════════════
 
-const MOCK_MODE = false;
+const MOCK_MODE = true;
 const GA4_ID = "G-XXXXXXXXXX";
 
 const gaEvent = (name, params = {}) => {
@@ -81,7 +81,7 @@ RULES FOR SOURCES LINE:
     
     kpis: `${base}\n\nDefine operating metrics and rhythm for ${company}.\n\nComplete context:\n${synthCtx || "[All prior analysis]"}\n\n${research}\n\n${rules}\n\n${ctx}\n\nRequired sections:\n## NORTH STAR METRIC (precise definition, current/target, why this predicts success)\n## SUPPORTING METRICS (2-3 metrics: definition, current, target, why each matters)\n## OPERATING CADENCE (weekly/monthly/quarterly combined - decisions made at each)\n## VANITY TRAP (misleading metric, why it deceives, what to track instead)\n\nWrite 500-600 words. Framework narrative - show how metrics connect to strategy. Compressed but logical flow. Single page target.\n\nEnd with: **Sources:** [comma-separated list on single line]`,
     
-    narrative: `${base}\n\nWrite investment thesis for ${company}.\n\nComplete analysis:\n${synthCtx || "[All 6 prior agents]"}\n\n${research}\n\nYou HAVE web_search. Search for valuation comps, exit multiples, market size projections.\n\n${rules}\n\n${ctx}\n\nRequired sections:\n## SITUATION (market, unit economics, current state with data)\n## COMPLICATION (structural problems, competitive threats, growth broken)\n## CONVICTION (The Insight, The Wedge, The Moat, The Metrics, The Outcome)\n## BEAR CASE (top 2 risks + counters)\n## THESIS SUMMARY (addressable market, next 18-24mo, outcome, risks)\n\nWrite 800-900 words. This is your ONLY 2-page agent. Build investment case with narrative arc. Setup → Problems → Solution → Risks → Thesis. Connected storytelling. Two pages acceptable.\n\nEnd with: **Sources:** [comma-separated list on single line]`,
+    narrative: `${base}\n\nWrite investment thesis for ${company}.\n\nSTART YOUR RESPONSE WITH: ## SITUATION\n\nComplete analysis:\n${synthCtx || "[All 6 prior agents]"}\n\n${research}\n\nYou HAVE web_search. Search for valuation comps, exit multiples, market size projections.\n\n${rules}\n\n${ctx}\n\nRequired sections:\n## SITUATION (market, unit economics, current state with data)\n## COMPLICATION (structural problems, competitive threats, growth broken)\n## CONVICTION (The Insight, The Wedge, The Moat, The Metrics, The Outcome)\n## BEAR CASE (top 2 risks + counters)\n## THESIS SUMMARY (addressable market, next 18-24mo, outcome, risks)\n\nWrite 1100-1300 words. This is your ONLY 2-page agent. Build investment case with narrative arc. Setup → Problems → Solution → Risks → Thesis. Connected storytelling. Two pages acceptable.\n\nIMPORTANT: Complete ALL sections fully. Do NOT truncate THESIS SUMMARY mid-sentence. Finish the complete analysis.\n\nEnd with: **Sources:** [comma-separated list on single line]`,
   };
 
   return prompts[id] || "";
