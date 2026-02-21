@@ -293,18 +293,25 @@ function md(text) {
   if (!text) return "";
   
   // First, fix the Sources line to ensure it's on one line
-  // Replace any newlines after **Sources:** with comma+space until we hit a blank line or end
   let fixedText = text.replace(/\*\*Sources:\*\*([^\n]*(?:\n(?!\n)[^\n]*)*)/g, (match, sources) => {
-    // Remove all newlines within the sources section and replace with comma+space
     const cleaned = sources.replace(/\n/g, ', ').replace(/,\s*,/g, ',').trim();
     return `**Sources:** ${cleaned}`;
   });
   
   return fixedText
+    // Handle **THE VERDICT** specially for synopsis
+    .replace(/\*\*THE VERDICT\*\*/g, `<div style="margin-bottom:16px;padding:14px;background:white;border:1px solid #d4724a;border-left:3px solid #d4724a"><div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#d4724a;margin-bottom:5px">THE VERDICT</div><p style="font-size:11px;line-height:1.55;color:#2b2b2b;margin:0">`)
+    // Handle ◉ sections for synopsis
+    .replace(/◉ ([A-Z\s]+)\n/g, `</p></div><div style="margin-bottom:12px;padding:12px;background:white;border:1px solid #3d6b54;border-left:3px solid #3d6b54"><div style="font-size:8px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#3d6b54;margin-bottom:5px">◉ $1</div><p style="font-size:9.5px;line-height:1.5;color:#4a4a4a;margin:0">`)
+    // Regular h3 section headers
     .replace(/^## (.+)$/gm, `<h3 class="agent-section-header" style="font-family:'Libre Baskerville',serif;font-size:14px;color:${P.forest};margin:16px 0 6px;border-bottom:1px solid ${P.sand};padding-bottom:4px;">$1</h3>`)
+    // Bold text
     .replace(/\*\*(.+?)\*\*/g, `<strong style="color:${P.ink};">$1</strong>`)
+    // Bullet points
     .replace(/^- (.+)$/gm, `<div style="display:flex;gap:7px;margin:3px 0;"><span style="color:${P.terra};">▸</span><span>$1</span></div>`)
+    // Paragraphs
     .replace(/\n\n/g, `</p><p style="margin:6px 0;">`)
+    // Line breaks
     .replace(/\n/g, " ");
 }
 
@@ -406,6 +413,96 @@ export default function App() {
       setStatuses(s => ({ ...s, [id]: "running" }));
       await runAgent(id, makePrompt(id, company, ctx, synthCtx), ctrl.signal, pdfs);
       await new Promise(r => setTimeout(r, 1500));
+    }
+
+    // Generate executive synopsis from all agent findings
+    if (!ctrl.signal.aborted) {
+      setStatuses(s => ({ ...s, synopsis: "running" }));
+      const allAgentResults = AGENTS.map(a => {
+        const result = results[a.id] || "";
+        return `\n━━━ ${a.label.toUpperCase()} ━━━\n${result}`;
+      }).join('\n\n');
+
+      const synopsisPrompt = `You are writing the opening page of a strategic intelligence report on ${company}. You have complete analysis from 7 research agents. Your job: write an EXECUTIVE SYNOPSIS that makes reading the full report irresistible.
+
+COMPLETE AGENT ANALYSIS:
+${allAgentResults}
+
+CRITICAL INSTRUCTIONS:
+
+Your synopsis must tell a STORY with narrative arc:
+1. Lead with the most provocative insight—what everyone gets wrong about ${company}
+2. Build tension by revealing the hidden dynamic or structural shift
+3. Connect findings into a coherent narrative (not disconnected bullets)
+4. Make each section flow to the next—create momentum
+5. End with stakes: what happens if they act on this vs. ignore it
+
+STRUCTURE:
+
+**THE VERDICT** (75-100 words)
+Open with the single most contrarian or surprising insight that reframes how to think about ${company}. This should make the reader go "wait, really?" Lead with a specific data point or dynamic that contradicts conventional wisdom. Then explain the strategic implication in 2-3 sentences. Make it impossible to ignore.
+
+**KEY FINDINGS** (Four sections, 75-90 words each)
+
+Write these as NARRATIVE SYNTHESIS, not bullet points. Each section should:
+- Start with the insight, not the category
+- Include 2-3 specific data points that validate the claim  
+- Connect causally to the next section (setup → evidence → implication)
+- Reveal something non-obvious
+
+◉ MARKET SIGNALS
+Pull the most contrarian insight from Market Signals analysis. What structural dynamic is everyone missing? Include specific metrics (TAM, unit economics, funding data) that prove the point. Connect to why this creates opportunity OR risk.
+
+◉ COMPETITIVE LANDSCAPE
+What's the hidden competitive reality? Where does ${company} actually win vs. where do they only THINK they win? Include competitor names and specific data. Reveal the structural moat or structural vulnerability that matters most.
+
+◉ GROWTH DYNAMICS
+Synthesize the most important insight from Channels + Segments analysis. What's working that should scale? What's broken that's quietly bleeding resources? Include CAC, conversion, or retention data. Make the resource reallocation thesis obvious.
+
+◉ STRATEGIC IMPERATIVE
+Pull from GTM Blueprint + Investment Memo. What's the ONE move that changes the trajectory? Include the specific bet, investment level, and expected outcome. Make it clear what success looks like and what failure costs.
+
+STYLE REQUIREMENTS:
+
+✓ Write in tight, connected prose—not bullets or lists
+✓ Lead each section with insight, not description
+✓ Use "According to [source]" or "per [data]" for credibility
+✓ Create flow: each section sets up the next
+✓ Remove hedge words (seems, appears, suggests)—be definitive
+✓ Pack density: every sentence adds new information
+✓ Match the voice of top-tier VC memos: sharp, substantive, opinionated
+
+BAD EXAMPLE (disconnected, descriptive):
+"Market Signals examines the category positioning. The analysis shows that ${company} operates in a growing market. Funding has been raised recently."
+
+GOOD EXAMPLE (narrative, insight-led):
+"Bulls celebrating the $15B TAM miss the creator exodus. Three thousand creators left in 2025—revealing the 10% fee creates a $2-3K/month tipping point where economics favor migration. The platform wins at the top 5% (writers earning $500K+ value simplicity over savings) while quietly losing the middle tier."
+
+Write 350-400 words total. Create momentum that makes the reader want to dive into the full analysis.
+
+Output format:
+**THE VERDICT**
+[Your compelling opening paragraph]
+
+◉ MARKET SIGNALS
+[Narrative synthesis paragraph]
+
+◉ COMPETITIVE LANDSCAPE
+[Narrative synthesis paragraph]
+
+◉ GROWTH DYNAMICS
+[Narrative synthesis paragraph]
+
+◉ STRATEGIC IMPERATIVE
+[Narrative synthesis paragraph]
+
+Start directly with the content. Do NOT include "Here is the synopsis" or explanatory text.`;
+
+      const synopsisText = await callClaude(synopsisPrompt, [], ctrl.signal, "synopsis");
+      if (!ctrl.signal.aborted) {
+        setResults(r => ({ ...r, synopsis: synopsisText }));
+        setStatuses(s => ({ ...s, synopsis: "done" }));
+      }
     }
 
     if (!ctrl.signal.aborted) { clearInterval(timerRef.current); setAppState("done"); }
@@ -608,71 +705,14 @@ export default function App() {
             <div style={{ background: "#faf8f4", border: "2px solid #1a3325", borderRadius: 4, padding: "18px 22px", marginBottom: 20, pageBreakInside: "avoid" }}>
               <h2 style={{ fontFamily: "'Libre Baskerville', serif", fontSize: 15, color: "#1a3325", marginBottom: 14, textAlign: "center", borderBottom: "1px solid #9b8c78", paddingBottom: 7 }}>EXECUTIVE SYNOPSIS</h2>
               
-              {/* The Verdict */}
-              <div style={{ marginBottom: 16, padding: "14px", background: "white", border: "1px solid #d4724a", borderLeft: "3px solid #d4724a" }}>
-                <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: "#d4724a", marginBottom: 5 }}>THE VERDICT</div>
-                <p style={{ fontSize: 11, lineHeight: 1.55, color: "#2b2b2b", margin: 0, marginBottom: 7 }}>
-                  This comprehensive strategic analysis examines {company}'s market position through 7 parallel intelligence agents operating simultaneously. The analysis synthesizes current market data from 2025-2026, competitive intelligence, and strategic frameworks to provide actionable insights across market signals, competitive landscape, channel efficiency, customer segmentation, go-to-market strategy, operating metrics, and investment thesis.
-                </p>
-                <p style={{ fontSize: 10.5, lineHeight: 1.55, color: "#2b2b2b", margin: 0 }}>
-                  Each agent conducts independent research using web search for current data, competitive databases, and analytical frameworks. Wave 1 agents (Market Signals, Competitive, Channels, Segments) establish foundational analysis. Wave 2 agents (GTM Blueprint, Operating Rhythm, Investment Memo) synthesize findings into strategic recommendations.
-                </p>
-              </div>
-
-              {/* Key Findings Grid */}
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: 16 }}>
-                <div>
-                  <div style={{ fontSize: 8, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: "#3d6b54", marginBottom: 5, paddingBottom: 3, borderBottom: "1px solid #d4c4a8" }}>◉ MARKET SIGNALS</div>
-                  <p style={{ fontSize: 9.5, lineHeight: 1.5, color: "#4a4a4a", margin: 0 }}>
-                    Examines category positioning and business model economics. Analyzes unit economics across customer tiers, capital environment including recent funding rounds and valuation multiples, competitive pressure points, and structural market risks. Identifies contrarian insights by analyzing what market bulls underestimate and what bears overestimate in current positioning.
-                  </p>
+              {/* Dynamic Synopsis from Agent */}
+              {results.synopsis ? (
+                <div style={{ fontSize: 10.5, lineHeight: 1.6, color: "#2b2b2b" }} dangerouslySetInnerHTML={{ __html: md(results.synopsis) }} />
+              ) : (
+                <div style={{ padding: "20px", textAlign: "center", color: "#999", fontStyle: "italic" }}>
+                  Synopsis generating...
                 </div>
-
-                <div>
-                  <div style={{ fontSize: 8, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: "#3d6b54", marginBottom: 5, paddingBottom: 3, borderBottom: "1px solid #d4c4a8" }}>◉ COMPETITIVE LANDSCAPE</div>
-                  <p style={{ fontSize: 9.5, lineHeight: 1.5, color: "#4a4a4a", margin: 0 }}>
-                    Maps competitive set with positioning analysis and funding multiples. Identifies specific areas where {company} establishes defensible moats versus structural weaknesses exploitable by competitors. Examines substitution risks from technology shifts, changing user behaviors, and adjacent category convergence. Analyzes funding dynamics versus competitive set.
-                  </p>
-                </div>
-
-                <div>
-                  <div style={{ fontSize: 8, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: "#3d6b54", marginBottom: 5, paddingBottom: 3, borderBottom: "1px solid #d4c4a8" }}>◉ CHANNEL STRATEGY</div>
-                  <p style={{ fontSize: 9.5, lineHeight: 1.5, color: "#4a4a4a", margin: 0 }}>
-                    Analyzes current channel mix and concentration risk across acquisition channels. Evaluates efficiency metrics including CAC by channel, conversion rates, and payback periods. Develops reallocation thesis for capital deployment with expected ROI across channels. Identifies critical platform dependencies and channel failure modes that could disrupt growth.
-                  </p>
-                </div>
-
-                <div>
-                  <div style={{ fontSize: 8, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: "#3d6b54", marginBottom: 5, paddingBottom: 3, borderBottom: "1px solid #d4c4a8" }}>◉ CUSTOMER SEGMENTS</div>
-                  <p style={{ fontSize: 9.5, lineHeight: 1.5, color: "#4a4a4a", margin: 0 }}>
-                    Profiles core customer segments with TAM sizing, unit economics, and adoption proof points. Identifies underserved adjacent markets representing whitespace opportunities with analysis of current barriers. Explores entirely new segment possibilities and requirements for unlock. Provides sequencing strategy for segment expansion with timing recommendations.
-                  </p>
-                </div>
-              </div>
-
-              {/* Strategic Synthesis */}
-              <div style={{ background: "white", padding: "14px", border: "1px solid #3d6b54", borderLeft: "3px solid #3d6b54", marginBottom: 10 }}>
-                <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: "#3d6b54", marginBottom: 5 }}>GTM BLUEPRINT</div>
-                <p style={{ fontSize: 10, lineHeight: 1.5, color: "#2b2b2b", margin: 0 }}>
-                  Synthesizes Wave 1 findings into actionable go-to-market strategy. Identifies what's working (validated approaches to keep and scale), what's broken (initiatives to kill and reallocate resources), and strategic bets (new initiatives with specific investment levels, success gates, and go/no-go decision criteria). Includes capital reallocation framework and primary risk mitigation.
-                </p>
-              </div>
-
-              {/* Operating Framework */}
-              <div style={{ background: "white", padding: "14px", border: "1px solid #3d6b54", borderLeft: "3px solid #3d6b54", marginBottom: 10 }}>
-                <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: "#3d6b54", marginBottom: 5 }}>OPERATING RHYTHM</div>
-                <p style={{ fontSize: 10, lineHeight: 1.5, color: "#2b2b2b", margin: 0 }}>
-                  Defines North Star metric predicting long-term success with current baseline and target trajectories. Establishes 2-3 supporting metrics with precise definitions, current values, and targets. Structures operating cadence across weekly (tactical decisions), monthly (strategic alignment), and quarterly (major pivots) rhythms. Identifies vanity metrics that mislead versus true business health indicators.
-                </p>
-              </div>
-
-              {/* Investment Thesis */}
-              <div style={{ background: "white", padding: "14px", border: "1px solid #3d6b54", borderLeft: "3px solid #3d6b54" }}>
-                <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: "#3d6b54", marginBottom: 5 }}>INVESTMENT MEMO</div>
-                <p style={{ fontSize: 10, lineHeight: 1.5, color: "#2b2b2b", margin: 0 }}>
-                  Presents complete investment thesis using situation-complication-conviction framework. Establishes current market situation with quantified metrics, identifies structural complications creating opportunity, and builds conviction case through unique insights, market wedge, defensible moats, key metrics, and expected outcomes. Includes bear case analysis with primary risks and counter-arguments. Concludes with addressable market projection, 18-24 month milestones, and valuation path.
-                </p>
-              </div>
+              )}
             </div>
 
             <div style={{ textAlign: "center", padding: "12px", background: "#f5f2ed", borderRadius: 4 }}>
