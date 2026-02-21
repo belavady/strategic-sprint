@@ -416,13 +416,23 @@ export default function App() {
       await new Promise(r => setTimeout(r, 1500));
     }
 
-    // Generate executive synopsis from all agent findings
+    // Generate executive synopsis from all agent findings  
     if (!ctrl.signal.aborted) {
       setStatuses(s => ({ ...s, synopsis: "running" }));
+      
+      // Wait a moment for state to fully update
+      await new Promise(r => setTimeout(r, 500));
+      
+      // Get fresh results from state
+      const currentResults = { ...newResults };
       const allAgentResults = AGENTS.map(a => {
-        const result = newResults[a.id] || "";
+        const result = currentResults[a.id] || "";
+        if (!result) console.log(`Missing result for ${a.id}`);
         return `\n━━━ ${a.label.toUpperCase()} ━━━\n${result}`;
       }).join('\n\n');
+
+      console.log("Synopsis receiving data for agents:", AGENTS.map(a => a.id).join(", "));
+      console.log("First 200 chars of each agent:", AGENTS.map(a => `${a.id}: ${(currentResults[a.id] || 'EMPTY').substring(0, 200)}`));
 
       const synopsisPrompt = `You are writing the opening page of a strategic intelligence report on ${company}. You have complete analysis from 7 research agents. Your job: write an EXECUTIVE SYNOPSIS that makes reading the full report irresistible.
 
@@ -441,27 +451,24 @@ Your synopsis must tell a STORY with narrative arc:
 STRUCTURE:
 
 **THE VERDICT** (75-100 words)
-Open with the single most contrarian or surprising insight that reframes how to think about ${company}. This should make the reader go "wait, really?" Lead with a specific data point or dynamic that contradicts conventional wisdom. Then explain the strategic implication in 2-3 sentences. Make it impossible to ignore.
+Open with the single most contrarian or surprising insight that reframes how to think about ${company}. Lead with specific data. Make it impossible to ignore.
 
-**KEY FINDINGS** (Four sections, 75-90 words each)
-
-Write these as NARRATIVE SYNTHESIS, not bullet points. Each section should:
-- Start with the insight, not the category
-- Include 2-3 specific data points that validate the claim  
-- Connect causally to the next section (setup → evidence → implication)
-- Reveal something non-obvious
+**KEY FINDINGS** (Five sections covering ALL 7 agents, 60-80 words each)
 
 ◉ MARKET SIGNALS
-Pull the most contrarian insight from Market Signals analysis. What structural dynamic is everyone missing? Include specific metrics (TAM, unit economics, funding data) that prove the point. Connect to why this creates opportunity OR risk.
+[Most contrarian market insight with specific metrics from Market Signals agent]
 
 ◉ COMPETITIVE LANDSCAPE
-What's the hidden competitive reality? Where does ${company} actually win vs. where do they only THINK they win? Include competitor names and specific data. Reveal the structural moat or structural vulnerability that matters most.
+[Hidden competitive reality from Competitive agent with competitor names and data]
 
 ◉ GROWTH DYNAMICS
-Synthesize the most important insight from Channels + Segments analysis. What's working that should scale? What's broken that's quietly bleeding resources? Include CAC, conversion, or retention data. Make the resource reallocation thesis obvious.
+[Synthesize Channels + Segments agents: what's working/broken with CAC/conversion data]
 
-◉ STRATEGIC IMPERATIVE
-Pull from GTM Blueprint + Investment Memo. What's the ONE move that changes the trajectory? Include the specific bet, investment level, and expected outcome. Make it clear what success looks like and what failure costs.
+◉ GTM & OPERATIONS
+[Synthesize GTM Blueprint + Operating Rhythm agents: strategic bet and North Star metric]
+
+◉ INVESTMENT THESIS
+[Pull from Investment Memo: the conviction case and expected outcome with timeline]
 
 STYLE REQUIREMENTS:
 
@@ -703,7 +710,7 @@ Start directly with the content. Do NOT include "Here is the synopsis" or explan
       {appState === "done" && (
         <div style={{ display: "none" }} className="print-only print-content-area">
           {/* Synopsis Page */}
-          <div style={{ pageBreakAfter: "always", padding: "70px 50px 30px 50px" }}>
+          <div style={{ padding: "70px 50px 30px 50px" }}>
             <div style={{ textAlign: "center", marginBottom: 22 }}>
               <h1 style={{ fontFamily: "'Libre Baskerville', serif", fontSize: 32, fontWeight: 700, marginBottom: 8, color: "#1a3325", letterSpacing: "0.05em" }}>{company.toUpperCase()}</h1>
               <p style={{ fontSize: 12, color: "#6b6b6b", marginBottom: 3 }}>7-Agent Parallel Intelligence Analysis</p>
