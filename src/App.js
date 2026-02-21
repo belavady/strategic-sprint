@@ -349,12 +349,12 @@ function md(text) {
   }
   
   // Regular content (agent analysis)
-  return fixedText
-    .replace(/^## (.+)$/gm, `<h3 class="agent-section-header" style="font-family:'Libre Baskerville',serif;font-size:14px;color:${P.forest};margin:16px 0 6px;border-bottom:1px solid ${P.sand};padding-bottom:4px;">$1</h3>`)
+  return '<p style="margin:6px 0;padding-top:110px;margin-top:-104px;">' + fixedText
+    .replace(/^## (.+)$/gm, `</p><h3 class="agent-section-header" style="font-family:'Libre Baskerville',serif;font-size:14px;color:${P.forest};margin:16px 0 6px;border-bottom:1px solid ${P.sand};padding-bottom:4px;padding-top:110px;margin-top:-94px;">$1</h3><p style="margin:6px 0;">`)
     .replace(/\*\*(.+?)\*\*/g, `<strong style="color:${P.ink};">$1</strong>`)
     .replace(/^- (.+)$/gm, `<div style="display:flex;gap:7px;margin:3px 0;"><span style="color:${P.terra};">▸</span><span>$1</span></div>`)
     .replace(/\n\n/g, `</p><p style="margin:6px 0;">`)
-    .replace(/\n/g, " ");
+    .replace(/\n/g, " ") + '</p>';
 }
 
 function AgentCard({ agent, status, result }) {
@@ -767,15 +767,15 @@ Start directly with the content. Do NOT include "Here is the synopsis" or explan
       {appState === "done" && (
         <div style={{ display: "none" }} className="print-only print-content-area">
           {/* Synopsis Page */}
-          <div style={{ padding: "70px 50px 30px 50px" }}>
-            <div style={{ textAlign: "center", marginBottom: 22 }}>
+          <div style={{ padding: "70px 50px 20px 50px", pageBreakAfter: "always" }}>
+            <div style={{ textAlign: "center", marginBottom: 18 }}>
               <h1 style={{ fontFamily: "'Libre Baskerville', serif", fontSize: 32, fontWeight: 700, marginBottom: 8, color: "#1a3325", letterSpacing: "0.05em" }}>{company.toUpperCase()}</h1>
               <p style={{ fontSize: 12, color: "#6b6b6b", marginBottom: 3 }}>7-Agent Parallel Intelligence Analysis</p>
-              <p style={{ fontSize: 10, color: "#9a9a9a" }}>Generated {new Date().toLocaleDateString()} in {formatTime(elapsed)} Minutes</p>
+              <p style={{ fontSize: 10, color: "#9a9a9a" }}>Generated {new Date().toLocaleDateString()} in {formatTime(elapsed)}</p>
             </div>
 
-            <div style={{ background: "#faf8f4", border: "2px solid #1a3325", borderRadius: 4, padding: "18px 22px", marginBottom: 20, pageBreakInside: "avoid" }}>
-              <h2 style={{ fontFamily: "'Libre Baskerville', serif", fontSize: 15, color: "#1a3325", marginBottom: 14, textAlign: "center", borderBottom: "1px solid #9b8c78", paddingBottom: 7 }}>EXECUTIVE SYNOPSIS</h2>
+            <div style={{ background: "#faf8f4", border: "2px solid #1a3325", borderRadius: 4, padding: "16px 20px", marginBottom: 16 }}>
+              <h2 style={{ fontFamily: "'Libre Baskerville', serif", fontSize: 15, color: "#1a3325", marginBottom: 12, textAlign: "center", borderBottom: "1px solid #9b8c78", paddingBottom: 6 }}>EXECUTIVE SYNOPSIS</h2>
               
               {/* Dynamic Synopsis from Agent */}
               {results.synopsis ? (
@@ -787,9 +787,9 @@ Start directly with the content. Do NOT include "Here is the synopsis" or explan
               )}
             </div>
 
-            <div style={{ textAlign: "center", padding: "12px", background: "#f5f2ed", borderRadius: 4 }}>
-              <p style={{ fontSize: 10, color: "#6b6b6b", lineHeight: 1.5, margin: 0 }}>
-                <strong style={{ color: "#1a3325" }}>The following pages</strong> present detailed findings from 7 parallel intelligence agents. Each agent synthesized web research, competitive data, and strategic frameworks.
+            <div style={{ textAlign: "center", padding: "10px", background: "#f5f2ed", borderRadius: 4 }}>
+              <p style={{ fontSize: 10, color: "#6b6b6b", lineHeight: 1.4, margin: 0 }}>
+                <strong style={{ color: "#1a3325" }}>The following pages</strong> present detailed findings from 7 parallel intelligence agents
               </p>
             </div>
           </div>
