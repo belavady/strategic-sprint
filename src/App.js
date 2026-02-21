@@ -5,7 +5,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 // NO TABS - Single page with sprint functionality  
 // ═══════════════════════════════════════════════════════
 
-const MOCK_MODE = false;
+const MOCK_MODE = true;
 const GA4_ID = "G-XXXXXXXXXX";
 
 const gaEvent = (name, params = {}) => {
@@ -46,24 +46,24 @@ const W1 = AGENTS.filter(a => a.wave === 1).map(a => a.id);
 const W2 = AGENTS.filter(a => a.wave === 2).map(a => a.id);
 
 const makePrompt = (id, company, ctx, synthCtx) => {
-  const base = `You are a strategic analyst. Write tight, analytical narrative - direct analysis, no memo format, no headers with TO/FROM/DATE. Start immediately with ## section headers.`;
-  const research = `Use web search for current 2025-2026 data. Cite sources inline like: "According to Sacra March 2025" or "per TechCrunch July 2025". Include **Sources:** list at end.`;
-  const rules = `Write in connected narrative prose. Multiple concrete examples per claim. Named companies with specific metrics. No bullet points unless listing items. Match the analytical style of professional research reports.`;
+  const base = `You are a strategic analyst. Write TIGHT narrative analysis - compressed but connected prose. Lead the reader to insights without over-explaining. Setup → Evidence → Implication pattern. Every sentence adds value. No memo format. Start with ## section headers immediately.`;
+  const research = `Use web search for current 2025-2026 data. Cite sources inline: "According to Sacra March 2025" or "per TechCrunch July 2025". Include **Sources:** list at end.`;
+  const rules = `CRITICAL STYLE: Connect thoughts just enough to lead reader to conclusion, but let THEM complete the thought. Remove "because", "which means", "this is important because" - keep transitions BETWEEN paragraphs, cut over-explanation WITHIN paragraphs. Pack concrete examples (3-5 per claim). Named companies with specific metrics. Match Erik Torenberg's analytical voice: sharp, substantive, connects dots without hand-holding.`;
 
   const prompts = {
-    signals: `${base}\n\nAnalyze market signals for ${company}.\n\n${research}\n${rules}\n\n${ctx}\n\nRequired sections:\n## CATEGORY SNAPSHOT\n## THE WEDGE EXPANDING\n## UNIT ECONOMICS\n## HIDDEN RISK\n## CAPITAL ENVIRONMENT\n## CONTRARIAN INSIGHT\n\nWrite 800-1000 words in narrative format. Start directly with "## CATEGORY SNAPSHOT" - no introduction, no memo header.`,
+    signals: `${base}\n\nAnalyze market signals for ${company}.\n\n${research}\n${rules}\n\n${ctx}\n\nRequired sections:\n## CATEGORY SNAPSHOT (business model, margins, positioning)\n## THE WEDGE EXPANDING (market opportunity, catalyst)\n## UNIT ECONOMICS (top/mid/median tiers with specifics)\n## HIDDEN RISK (competitive pressure, structural issues)\n## CAPITAL ENVIRONMENT (funding, valuation, M&A context)\n## CONTRARIAN INSIGHT (what bulls miss, what bears miss)\n\nWrite 500-600 words. Narrative flow with connected insights. Dense but readable. Setup facts → implications, skip the "because." Single page target.`,
     
-    competitive: `${base}\n\nAnalyze competitive landscape for ${company}.\n\n${research}\n${rules}\n\n${ctx}\n\nRequired sections:\n## COMPETITIVE SET\n## WHERE WINS\n## WHERE LOSES\n## SUBSTITUTION RISK\n## FUNDING GAP\n\nWrite 900-1100 words. Start with "## COMPETITIVE SET" immediately.`,
+    competitive: `${base}\n\nAnalyze competitive landscape for ${company}.\n\n${research}\n${rules}\n\n${ctx}\n\nRequired sections:\n## COMPETITIVE SET (players, positioning, multiples)\n## WHERE WINS (moat, defensibility with evidence)\n## WHERE LOSES (structural weaknesses, competitive threats)\n## SUBSTITUTION RISK (technology/behavior shifts)\n\nWrite 500-600 words. Connect competitive dynamics - show causality without stating "because." Dense narrative. Single page target.`,
     
-    channels: `${base}\n\nAnalyze channel strategy for ${company}.\n\n${research}\n${rules}\n\n${ctx}\n\nRequired sections:\n## CURRENT MIX\n## EFFICIENCY\n## REALLOCATION THESIS\n## HIDDEN LEVERAGE\n## CHANNEL RISK\n\nWrite 800-1000 words. Start with "## CURRENT MIX" immediately.`,
+    channels: `${base}\n\nAnalyze channel strategy for ${company}.\n\n${research}\n${rules}\n\n${ctx}\n\nRequired sections:\n## CURRENT MIX (channel breakdown, concentration)\n## EFFICIENCY (what works, what's broken, CAC by channel)\n## REALLOCATION THESIS (strategic shifts, expected ROI)\n## CHANNEL RISK (dependency, failure modes)\n\nWrite 500-600 words. Flow from current state → problems → solutions. Let reader connect dots. Single page target.`,
     
-    segments: `${base}\n\nAnalyze customer segments for ${company}.\n\n${research}\n${rules}\n\n${ctx}\n\nRequired sections:\n## CORE SEGMENT\n## UNDERSERVED ADJACENT\n## WHITESPACE\n## SEQUENCING\n## PARETO\n\nWrite 800-1000 words. Start with "## CORE SEGMENT" immediately.`,
+    segments: `${base}\n\nAnalyze customer segments for ${company}.\n\n${research}\n${rules}\n\n${ctx}\n\nRequired sections:\n## CORE SEGMENT (who, TAM, unit economics, proof points)\n## UNDERSERVED ADJACENT (whitespace, why currently underserved)\n## WHITESPACE (entirely new segments, unlock requirements)\n## SEQUENCING (which next, why, timing)\n\nWrite 500-600 words. Narrative builds segment strategy - transitions between segments show logic. Single page target.`,
     
-    pivot: `${base}\n\nSynthesize GTM strategy for ${company} using prior analysis.\n\nPrior findings:\n${synthCtx || "[Wave 1 analysis]"}\n\n${research}\n${rules}\n\n${ctx}\n\nRequired sections:\n## SYNTHESIS\n## WORKING: KEEP\n## BROKEN: KILL\n## STRATEGIC BET\n## CAPITAL REALLOCATION\n## RISK\n\nWrite 1000-1200 words. Start with "## SYNTHESIS" immediately.`,
+    pivot: `${base}\n\nSynthesize GTM strategy for ${company} using prior analysis.\n\nPrior findings:\n${synthCtx || "[Wave 1 analysis]"}\n\n${research}\n${rules}\n\n${ctx}\n\nRequired sections:\n## SYNTHESIS (what Agents 1-4 reveal, strategic thesis)\n## WORKING: KEEP (what's validated, why it works)\n## BROKEN: KILL (what's not working, kill criteria)\n## STRATEGIC BET (specific initiative, investment, gates)\n## RISK (primary risk, mitigation)\n\nWrite 600-700 words. Synthesize findings into coherent strategy. Connect previous insights → strategic moves. Tight but flowing narrative. Single page target.`,
     
-    kpis: `${base}\n\nDefine operating metrics and rhythm for ${company}.\n\nComplete context:\n${synthCtx || "[All prior analysis]"}\n\n${research}\n${rules}\n\n${ctx}\n\nRequired sections:\n## NORTH STAR METRIC\n## SUPPORTING 1-3 (three supporting metrics)\n## WEEKLY RHYTHM\n## MONTHLY RHYTHM\n## QUARTERLY RHYTHM\n## VANITY TRAP\n\nWrite 800-1000 words. Start with "## NORTH STAR METRIC" immediately.`,
+    kpis: `${base}\n\nDefine operating metrics and rhythm for ${company}.\n\nComplete context:\n${synthCtx || "[All prior analysis]"}\n\n${research}\n${rules}\n\n${ctx}\n\nRequired sections:\n## NORTH STAR METRIC (precise definition, current/target, why this predicts success)\n## SUPPORTING METRICS (2-3 metrics: definition, current, target, why each matters)\n## OPERATING CADENCE (weekly/monthly/quarterly combined - decisions made at each)\n## VANITY TRAP (misleading metric, why it deceives, what to track instead)\n\nWrite 500-600 words. Framework narrative - show how metrics connect to strategy. Compressed but logical flow. Single page target.`,
     
-    narrative: `${base}\n\nWrite investment thesis for ${company}.\n\nComplete analysis:\n${synthCtx || "[All 6 prior agents]"}\n\n${research}\n${rules}\n\n${ctx}\n\nRequired sections:\n## SITUATION\n## COMPLICATION\n## CONVICTION\n## BEAR CASE\n## THESIS SUMMARY\n\nWrite 1100-1300 words. Start with "## SITUATION" immediately.`,
+    narrative: `${base}\n\nWrite investment thesis for ${company}.\n\nComplete analysis:\n${synthCtx || "[All 6 prior agents]"}\n\n${research}\n${rules}\n\n${ctx}\n\nRequired sections:\n## SITUATION (market, unit economics, current state with data)\n## COMPLICATION (structural problems, competitive threats, growth broken)\n## CONVICTION (The Insight, The Wedge, The Moat, The Metrics, The Outcome)\n## BEAR CASE (top 2 risks + counters)\n## THESIS SUMMARY (addressable market, next 18-24mo, outcome, risks)\n\nWrite 800-900 words. This is your ONLY 2-page agent. Build investment case with narrative arc. Setup → Problems → Solution → Risks → Thesis. Connected storytelling. Two pages acceptable.`,
   };
 
   return prompts[id] || "";
@@ -428,23 +428,23 @@ export default function App() {
           .agent-content { 
             max-height: none !important; 
             overflow: visible !important; 
-            padding-top: 70px;
-            margin-top: -70px;
+            padding-top: 80px !important;
+            margin-top: -80px !important;
           }
           /* Prevent headers from being orphaned */
           h2 {
             page-break-after: avoid !important;
             page-break-inside: avoid !important;
           }
-          /* Every h3 and p gets top padding to avoid header overlap on page breaks */
+          /* Every h3 and p gets EXTRA top padding to avoid header overlap on ANY page breaks */
           .agent-content h3 {
-            padding-top: 70px !important;
-            margin-top: -54px !important;
+            padding-top: 80px !important;
+            margin-top: -64px !important;
             page-break-after: avoid !important;
           }
           .agent-content p {
-            padding-top: 70px !important;
-            margin-top: -64px !important;
+            padding-top: 80px !important;
+            margin-top: -74px !important;
           }
         }
       `}</style>
@@ -587,54 +587,21 @@ export default function App() {
               <div style={{ marginBottom: 18, padding: "15px", background: "white", border: "1px solid #d4724a", borderLeft: "3px solid #d4724a" }}>
                 <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: "#d4724a", marginBottom: 6 }}>THE VERDICT</div>
                 <p style={{ fontSize: 11.5, lineHeight: 1.6, color: "#2b2b2b", margin: 0 }}>
-                  {company} operates in a $15B+ creator economy but targets the wrong segment. The opportunity isn't democratizing newsletters for 500K hobbyists—it's owning infrastructure for the top 500-1K professional writers earning $100K-$5M annually. Currently captured only ~200 of 500 addressable journalists plus essentially zero of 500-1K corporate experts. Strategic pivot required: kill consumer social features showing &lt;5% adoption, build B2B features for institutional buyers. With proper repositioning: $2-6B valuation potential over 3-4 years versus current $1.1B.
+                  This 7-agent parallel intelligence analysis examines {company}'s market position, competitive landscape, channel strategy, customer segments, go-to-market approach, operating metrics, and investment thesis. The analysis synthesizes current market data, competitive dynamics, and strategic insights to provide a comprehensive view of opportunities and risks.
                 </p>
               </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px", marginBottom: 18 }}>
-                <div>
-                  <div style={{ fontSize: 8, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: "#3d6b54", marginBottom: 5, paddingBottom: 3, borderBottom: "1px solid #d4c4a8" }}>◉ MARKET SIGNALS</div>
-                  <p style={{ fontSize: 10, lineHeight: 1.5, color: "#4a4a4a", margin: 0 }}>
-                    Media collapse accelerating: 17K+ jobs cut 2025. However, 3K creators left Substack in 2025 (1K to beehiiv Q1) revealing fee sensitivity—€2-3K/month tipping point where 10% fee exceeds flat alternatives.
-                  </p>
-                </div>
-
-                <div>
-                  <div style={{ fontSize: 8, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: "#3d6b54", marginBottom: 5, paddingBottom: 3, borderBottom: "1px solid #d4c4a8" }}>◉ COMPETITIVE</div>
-                  <p style={{ fontSize: 10, lineHeight: 1.5, color: "#4a4a4a", margin: 0 }}>
-                    Brand moat (68% journalist consideration) but structurally broken discovery (zero algorithm). Beehiiv/Ghost attack with 0% fees. Grow-to-IPO only path creates capital pressure.
-                  </p>
-                </div>
-
-                <div>
-                  <div style={{ fontSize: 8, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: "#3d6b54", marginBottom: 5, paddingBottom: 3, borderBottom: "1px solid #d4c4a8" }}>◉ CHANNELS</div>
-                  <p style={{ fontSize: 10, lineHeight: 1.5, color: "#4a4a4a", margin: 0 }}>
-                    80% traffic direct, 15-20% Twitter. 43 of top 50 cite Twitter as #1 growth—Oct 2023 algorithm change caused 30-40% drop. If Twitter blocks links, CAC jumps 3-5x with no Plan B.
-                  </p>
-                </div>
-
-                <div>
-                  <div style={{ fontSize: 8, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: "#3d6b54", marginBottom: 5, paddingBottom: 3, borderBottom: "1px solid #d4c4a8" }}>◉ SEGMENTS</div>
-                  <p style={{ fontSize: 10, lineHeight: 1.5, color: "#4a4a4a", margin: 0 }}>
-                    Core: 300 remaining journalist TAM. Underserved: 500-1K corporate experts with &lt;50 current penetration. Missing B2B features. Higher LTV ($50-200/mo), lower churn (85-92% vs 65-75%).
-                  </p>
-                </div>
-              </div>
-
-              <div style={{ background: "white", padding: "15px", border: "1px solid #3d6b54", borderLeft: "3px solid #3d6b54" }}>
-                <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: "#3d6b54", marginBottom: 6 }}>STRATEGIC RECOMMENDATION</div>
-                <p style={{ fontSize: 10.5, lineHeight: 1.6, color: "#2b2b2b", marginBottom: 10 }}>
-                  <strong>Immediate:</strong> (1) Kill Notes/Chat/Discover—reallocate 15-20 engineers, save $3-5M. (2) Launch Substack Pro: institutional billing, team accounts. Investment: $3.5-4.5M. Gates: &gt;50 signups + &gt;50% conversion = DOUBLE DOWN. (3) Deploy cross-subscription engine: &lt;5%→20% = $3-4M incremental revenue.
-                </p>
+              <div style={{ marginBottom: 18, padding: "15px", background: "white", border: "1px solid #3d6b54", borderLeft: "3px solid #3d6b54" }}>
+                <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: "#3d6b54", marginBottom: 6 }}>ANALYSIS COMPLETE</div>
                 <p style={{ fontSize: 10.5, lineHeight: 1.6, color: "#2b2b2b", margin: 0 }}>
-                  <strong>Outcome:</strong> $1-1.5B GMV by 2027-28 = $200-450M revenue = $2-6.75B valuation (2-6x from $1.1B over 3-4yrs). Risks: corporate experts may not publish consistently, Twitter could block links, AI audio disruption 36mo.
+                  Review the detailed findings from each agent below. The analysis covers market signals, competitive positioning, channel efficiency, customer segmentation, GTM strategy, operating rhythm, and investment considerations.
                 </p>
               </div>
             </div>
 
             <div style={{ textAlign: "center", padding: "15px", background: "#f5f2ed", borderRadius: 4 }}>
               <p style={{ fontSize: 10, color: "#6b6b6b", lineHeight: 1.5, margin: 0 }}>
-                <strong style={{ color: "#1a3325" }}>The following pages</strong> present detailed findings from 7 parallel intelligence agents. Each agent synthesized web research, competitive data, and strategic frameworks. Analysis time: ~4-6 minutes. Read time: ~25-30 minutes.
+                <strong style={{ color: "#1a3325" }}>The following pages</strong> present detailed findings from 7 parallel intelligence agents. Each agent synthesized web research, competitive data, and strategic frameworks.
               </p>
             </div>
           </div>
