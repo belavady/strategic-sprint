@@ -5,7 +5,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 // NO TABS - Single page with sprint functionality  
 // ═══════════════════════════════════════════════════════
 
-const MOCK_MODE = false;
+const MOCK_MODE = true;
 const GA4_ID = "G-XXXXXXXXXX";
 
 const gaEvent = (name, params = {}) => {
@@ -454,11 +454,13 @@ export default function App() {
           }
           .agent-content { 
             max-height: none !important; 
-            overflow: visible !important; 
+            overflow: visible !important;
+            padding-top: 100px !important;
+            margin-top: -94px !important;
           }
           .agent-content * {
-            padding-top: 70px !important;
-            margin-top: -64px !important;
+            padding-top: 100px !important;
+            margin-top: -94px !important;
           }
           h2 {
             page-break-after: avoid !important;
