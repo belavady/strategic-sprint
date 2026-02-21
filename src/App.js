@@ -5,7 +5,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 // NO TABS - Single page with sprint functionality  
 // ═══════════════════════════════════════════════════════
 
-const MOCK_MODE = false;
+const MOCK_MODE = false; // Set to true for testing, false for production
 const GA4_ID = "G-XXXXXXXXXX";
 
 const gaEvent = (name, params = {}) => {
@@ -549,13 +549,19 @@ Output format:
 ◉ COMPETITIVE LANDSCAPE
 [Narrative synthesis paragraph]
 
-◉ GROWTH DYNAMICS
+◉ CHANNELS
 [Narrative synthesis paragraph]
 
-◉ STRATEGIC IMPERATIVE
+◉ SEGMENTS
 [Narrative synthesis paragraph]
 
-Start directly with the content. Do NOT include "Here is the synopsis" or explanatory text.`;
+◉ GTM & OPERATIONS
+[Narrative synthesis paragraph]
+
+◉ INVESTMENT THESIS
+[Narrative synthesis paragraph]
+
+Start directly with the content. Do NOT include "Here is the synopsis" or explanatory text. Do NOT add "---" dividers or "**KEY FINDINGS**" headers.`;
 
       const synopsisText = await callClaude(synopsisPrompt, [], ctrl.signal, "synopsis");
       if (!ctrl.signal.aborted) {
