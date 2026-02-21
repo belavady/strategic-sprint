@@ -455,10 +455,14 @@ export default function App() {
           .agent-content { 
             max-height: none !important; 
             overflow: visible !important;
-            padding-top: 100px !important;
-            margin-top: -94px !important;
           }
-          .agent-content * {
+          /* Apply padding to ALL elements inside agent-content */
+          .agent-content > *,
+          .agent-content p,
+          .agent-content h3,
+          .agent-content div,
+          .agent-content strong,
+          .agent-section-header {
             padding-top: 100px !important;
             margin-top: -94px !important;
           }
