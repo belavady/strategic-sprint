@@ -5,7 +5,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 // NO TABS - Single page with sprint functionality  
 // ═══════════════════════════════════════════════════════
 
-const MOCK_MODE = false;
+const MOCK_MODE = true;
 const GA4_ID = "G-XXXXXXXXXX";
 
 const gaEvent = (name, params = {}) => {
@@ -46,7 +46,11 @@ const W1 = AGENTS.filter(a => a.wave === 1).map(a => a.id);
 const W2 = AGENTS.filter(a => a.wave === 2).map(a => a.id);
 
 const makePrompt = (id, company, ctx, synthCtx) => {
-  const base = `You are a strategic analyst with access to web_search tool. You MUST use web_search to find current 2025-2026 data. Do NOT say you lack access to current data - you have web_search available. Write TIGHT narrative analysis - compressed but connected prose. Lead the reader to insights without over-explaining. Setup → Evidence → Implication pattern. Every sentence adds value. No memo format. Start with ## section headers immediately.`;
+  const base = `You are a strategic analyst with access to web_search tool. You MUST use web_search to find current 2025-2026 data. Do NOT say you lack access to current data - you have web_search available. 
+
+CRITICAL: When you use web_search, execute it - do NOT show the search syntax/code to the user. Just use the tool and incorporate findings into your analysis.
+
+Write TIGHT narrative analysis - compressed but connected prose. Lead the reader to insights without over-explaining. Setup → Evidence → Implication pattern. Every sentence adds value. No memo format. Start with ## section headers immediately.`;
   const research = `CRITICAL: Use web_search tool extensively for current data. Search for: "${company} funding 2025", "${company} metrics 2025", "${company} competitors", "${company} news 2025". Cite sources inline: "According to Sacra March 2025" or "per TechCrunch July 2025". 
 
 At the very end, include sources in this EXACT format on a SINGLE LINE:
@@ -56,13 +60,13 @@ DO NOT put each source on a new line. DO NOT use bullet points. Comma-separated 
   const rules = `CRITICAL STYLE: Connect thoughts just enough to lead reader to conclusion, but let THEM complete the thought. Remove "because", "which means", "this is important because" - keep transitions BETWEEN paragraphs, cut over-explanation WITHIN paragraphs. Pack concrete examples (3-5 per claim). Named companies with specific metrics. Match Erik Torenberg's analytical voice: sharp, substantive, connects dots without hand-holding.`;
 
   const prompts = {
-    signals: `${base}\n\nAnalyze market signals for ${company}.\n\n${research}\n\nYou HAVE web_search tool access. Use it now to find:\n- Recent funding rounds for ${company}\n- User/revenue metrics 2025\n- Market size data\n- Competitor funding\n\n${rules}\n\n${ctx}\n\nRequired sections:\n## CATEGORY SNAPSHOT (business model, margins, positioning)\n## THE WEDGE EXPANDING (market opportunity, catalyst)\n## UNIT ECONOMICS (top/mid/median tiers with specifics)\n## HIDDEN RISK (competitive pressure, structural issues)\n## CAPITAL ENVIRONMENT (funding, valuation, M&A context)\n## CONTRARIAN INSIGHT (what bulls miss, what bears miss)\n\nWrite 500-600 words. Narrative flow with connected insights. Dense but readable. Setup facts → implications, skip the "because." Single page target.\n\nEnd with: **Sources:** [comma-separated list on single line]`,
+    signals: `${base}\n\nAnalyze market signals for ${company}.\n\n${research}\n\nYou HAVE web_search tool access. Use it now to find:\n- Search EXACTLY: "${company}" (the company name as provided, not a related category)\n- "${company} funding 2025"\n- "${company} revenue metrics 2025"\n- "${company} latest news 2025"\n- "${company} competitors"\n\nIMPORTANT: Search for the EXACT company "${company}", not the broader category or similar-sounding companies.\n\n${rules}\n\n${ctx}\n\nRequired sections:\n## CATEGORY SNAPSHOT (business model, margins, positioning)\n## THE WEDGE EXPANDING (market opportunity, catalyst)\n## UNIT ECONOMICS (top/mid/median tiers with specifics)\n## HIDDEN RISK (competitive pressure, structural issues)\n## CAPITAL ENVIRONMENT (funding, valuation, M&A context)\n## CONTRARIAN INSIGHT (what bulls miss, what bears miss)\n\nWrite 500-600 words. Narrative flow with connected insights. Dense but readable. Setup facts → implications, skip the "because." Single page target.\n\nEnd with: **Sources:** [comma-separated list on single line]`,
     
-    competitive: `${base}\n\nAnalyze competitive landscape for ${company}.\n\n${research}\n\nYou HAVE web_search tool. Search for ${company} competitors, market positioning, recent competitive moves.\n\n${rules}\n\n${ctx}\n\nRequired sections:\n## COMPETITIVE SET (players, positioning, multiples)\n## WHERE WINS (moat, defensibility with evidence)\n## WHERE LOSES (structural weaknesses, competitive threats)\n## SUBSTITUTION RISK (technology/behavior shifts)\n\nWrite 500-600 words. Connect competitive dynamics - show causality without stating "because." Dense narrative. Single page target.\n\nEnd with: **Sources:** [comma-separated list on single line]`,
+    competitive: `${base}\n\nAnalyze competitive landscape for ${company}.\n\n${research}\n\nYou HAVE web_search tool. Search for:\n- EXACTLY: "${company}" competitors 2025\n- "${company} vs [competitors]" comparisons\n- Market positioning for ${company}\n\nIMPORTANT: Search for the EXACT company "${company}", not similar-sounding companies.\n\n${rules}\n\n${ctx}\n\nRequired sections:\n## COMPETITIVE SET (players, positioning, multiples)\n## WHERE WINS (moat, defensibility with evidence)\n## WHERE LOSES (structural weaknesses, competitive threats)\n## SUBSTITUTION RISK (technology/behavior shifts)\n\nWrite 500-600 words. Connect competitive dynamics - show causality without stating "because." Dense narrative. Single page target.\n\nEnd with: **Sources:** [comma-separated list on single line]`,
     
-    channels: `${base}\n\nAnalyze channel strategy for ${company}.\n\n${research}\n\nUse web_search for traffic sources, CAC data, platform dependencies.\n\n${rules}\n\n${ctx}\n\nRequired sections:\n## CURRENT MIX (channel breakdown, concentration)\n## EFFICIENCY (what works, what's broken, CAC by channel)\n## REALLOCATION THESIS (strategic shifts, expected ROI)\n## CHANNEL RISK (dependency, failure modes)\n\nWrite 500-600 words. Flow from current state → problems → solutions. Let reader connect dots. Single page target.\n\nEnd with: **Sources:** [comma-separated list on single line]`,
+    channels: `${base}\n\nAnalyze channel strategy for ${company}.\n\n${research}\n\nUse web_search for:\n- "${company}" customer acquisition 2025\n- "${company}" marketing channels\n- Traffic sources for ${company}\n\n${rules}\n\n${ctx}\n\nRequired sections:\n## CURRENT MIX (channel breakdown, concentration)\n## EFFICIENCY (what works, what's broken, CAC by channel)\n## REALLOCATION THESIS (strategic shifts, expected ROI)\n## CHANNEL RISK (dependency, failure modes)\n\nWrite 500-600 words. Flow from current state → problems → solutions. Let reader connect dots. Single page target.\n\nEnd with: **Sources:** [comma-separated list on single line]`,
     
-    segments: `${base}\n\nAnalyze customer segments for ${company}.\n\n${research}\n\nUse web_search for customer data, segment sizes, adoption metrics.\n\n${rules}\n\n${ctx}\n\nRequired sections:\n## CORE SEGMENT (who, TAM, unit economics, proof points)\n## UNDERSERVED ADJACENT (whitespace, why currently underserved)\n## WHITESPACE (entirely new segments, unlock requirements)\n## SEQUENCING (which next, why, timing)\n\nWrite 500-600 words. Narrative builds segment strategy - transitions between segments show logic. Single page target.\n\nEnd with: **Sources:** [comma-separated list on single line]`,
+    segments: `${base}\n\nAnalyze customer segments for ${company}.\n\n${research}\n\nUse web_search for:\n- "${company}" customers 2025\n- "${company}" target market\n- User demographics for ${company}\n\n${rules}\n\n${ctx}\n\nRequired sections:\n## CORE SEGMENT (who, TAM, unit economics, proof points)\n## UNDERSERVED ADJACENT (whitespace, why currently underserved)\n## WHITESPACE (entirely new segments, unlock requirements)\n## SEQUENCING (which next, why, timing)\n\nWrite 500-600 words. Narrative builds segment strategy - transitions between segments show logic. Single page target.\n\nEnd with: **Sources:** [comma-separated list on single line]`,
     
     pivot: `${base}\n\nSynthesize GTM strategy for ${company} using prior analysis.\n\nPrior findings:\n${synthCtx || "[Wave 1 analysis]"}\n\n${research}\n\n${rules}\n\n${ctx}\n\nRequired sections:\n## SYNTHESIS (what Agents 1-4 reveal, strategic thesis)\n## WORKING: KEEP (what's validated, why it works)\n## BROKEN: KILL (what's not working, kill criteria)\n## STRATEGIC BET (specific initiative, investment, gates)\n## RISK (primary risk, mitigation)\n\nWrite 600-700 words. Synthesize findings into coherent strategy. Connect previous insights → strategic moves. Tight but flowing narrative. Single page target.\n\nEnd with: **Sources:** [comma-separated list on single line]`,
     
@@ -592,8 +596,11 @@ export default function App() {
               {/* The Verdict */}
               <div style={{ marginBottom: 18, padding: "15px", background: "white", border: "1px solid #d4724a", borderLeft: "3px solid #d4724a" }}>
                 <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: "#d4724a", marginBottom: 6 }}>THE VERDICT</div>
-                <p style={{ fontSize: 11.5, lineHeight: 1.6, color: "#2b2b2b", margin: 0 }}>
-                  Comprehensive strategic analysis examining {company}'s market position, competitive dynamics, and growth trajectory. Analysis synthesizes current market data, competitive intelligence, channel efficiency, customer segmentation, go-to-market strategy, operating metrics, and investment thesis to identify key opportunities and strategic risks.
+                <p style={{ fontSize: 11.5, lineHeight: 1.6, color: "#2b2b2b", margin: 0, marginBottom: 8 }}>
+                  This comprehensive strategic analysis examines {company}'s market position through 7 parallel intelligence agents operating simultaneously. The analysis synthesizes current market data, competitive dynamics, and strategic frameworks to provide actionable insights across market signals, competitive landscape, channel efficiency, customer segmentation, go-to-market strategy, operating metrics, and investment thesis.
+                </p>
+                <p style={{ fontSize: 11, lineHeight: 1.6, color: "#2b2b2b", margin: 0 }}>
+                  Each agent conducts independent research using web search for 2025-2026 data, competitive intelligence databases, and strategic frameworks. Wave 1 agents (Market Signals, Competitive, Channels, Segments) establish foundational analysis. Wave 2 agents (GTM Blueprint, Operating Rhythm, Investment Memo) synthesize findings into strategic recommendations and investment thesis.
                 </p>
               </div>
 
@@ -602,37 +609,53 @@ export default function App() {
                 <div>
                   <div style={{ fontSize: 8, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: "#3d6b54", marginBottom: 5, paddingBottom: 3, borderBottom: "1px solid #d4c4a8" }}>◉ MARKET SIGNALS</div>
                   <p style={{ fontSize: 10, lineHeight: 1.5, color: "#4a4a4a", margin: 0 }}>
-                    Analysis of market opportunity, unit economics across customer tiers, capital environment, and competitive threats. Identifies contrarian insights missed by bulls and bears.
+                    Examines category positioning, business model economics, and market opportunity. Analyzes unit economics across customer tiers, capital environment including recent funding rounds and valuation multiples, competitive pressure points, and structural market risks. Identifies contrarian insights by analyzing what market bulls underestimate and what bears overestimate in current positioning.
                   </p>
                 </div>
 
                 <div>
-                  <div style={{ fontSize: 8, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: "#3d6b54", marginBottom: 5, paddingBottom: 3, borderBottom: "1px solid #d4c4a8" }}>◉ COMPETITIVE</div>
+                  <div style={{ fontSize: 8, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: "#3d6b54", marginBottom: 5, paddingBottom: 3, borderBottom: "1px solid #d4c4a8" }}>◉ COMPETITIVE LANDSCAPE</div>
                   <p style={{ fontSize: 10, lineHeight: 1.5, color: "#4a4a4a", margin: 0 }}>
-                    Competitive positioning map showing where {company} wins and loses. Examines moat defensibility, substitution risks, and funding dynamics versus competitors.
+                    Maps competitive set with positioning analysis and funding multiples. Identifies specific areas where {company} establishes defensible moats versus structural weaknesses exploitable by competitors. Examines substitution risks from technology shifts, changing user behaviors, and adjacent category convergence. Analyzes funding gaps and capital advantages versus competitive set.
                   </p>
                 </div>
 
                 <div>
-                  <div style={{ fontSize: 8, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: "#3d6b54", marginBottom: 5, paddingBottom: 3, borderBottom: "1px solid #d4c4a8" }}>◉ CHANNELS</div>
+                  <div style={{ fontSize: 8, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: "#3d6b54", marginBottom: 5, paddingBottom: 3, borderBottom: "1px solid #d4c4a8" }}>◉ CHANNEL STRATEGY</div>
                   <p style={{ fontSize: 10, lineHeight: 1.5, color: "#4a4a4a", margin: 0 }}>
-                    Channel mix efficiency analysis, CAC by channel, and strategic reallocation opportunities. Identifies platform dependencies and critical growth risks.
+                    Analyzes current channel mix and concentration risk across acquisition channels. Evaluates efficiency metrics including CAC by channel, conversion rates, and payback periods. Develops reallocation thesis for capital deployment with expected ROI across channels. Identifies critical platform dependencies and channel failure modes that could disrupt growth trajectory.
                   </p>
                 </div>
 
                 <div>
-                  <div style={{ fontSize: 8, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: "#3d6b54", marginBottom: 5, paddingBottom: 3, borderBottom: "1px solid #d4c4a8" }}>◉ SEGMENTS</div>
+                  <div style={{ fontSize: 8, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: "#3d6b54", marginBottom: 5, paddingBottom: 3, borderBottom: "1px solid #d4c4a8" }}>◉ CUSTOMER SEGMENTS</div>
                   <p style={{ fontSize: 10, lineHeight: 1.5, color: "#4a4a4a", margin: 0 }}>
-                    Core customer segments, underserved adjacencies, and whitespace opportunities. Includes segment sequencing strategy and Pareto analysis of value concentration.
+                    Profiles core customer segments with TAM sizing, unit economics, and adoption proof points. Identifies underserved adjacent markets representing whitespace opportunities with analysis of current barriers. Explores entirely new segment possibilities and requirements for unlock. Provides sequencing strategy for segment expansion with timing and resource allocation recommendations.
                   </p>
                 </div>
               </div>
 
-              {/* Strategic Recommendation */}
-              <div style={{ background: "white", padding: "15px", border: "1px solid #3d6b54", borderLeft: "3px solid #3d6b54" }}>
-                <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: "#3d6b54", marginBottom: 6 }}>STRATEGIC SYNTHESIS</div>
+              {/* Strategic Synthesis */}
+              <div style={{ background: "white", padding: "15px", border: "1px solid #3d6b54", borderLeft: "3px solid #3d6b54", marginBottom: 12 }}>
+                <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: "#3d6b54", marginBottom: 6 }}>GTM BLUEPRINT</div>
                 <p style={{ fontSize: 10.5, lineHeight: 1.6, color: "#2b2b2b", margin: 0 }}>
-                  GTM blueprint synthesizes findings into actionable strategy. Operating rhythm defines North Star metric and supporting KPIs. Investment thesis presents situation-complication-conviction framework with bear case analysis and valuation path.
+                  Synthesizes Wave 1 findings into actionable go-to-market strategy. Identifies what's working (validated approaches to keep and scale), what's broken (initiatives to kill and reallocate resources), and strategic bets (new initiatives with specific investment levels, success gates, and go/no-go decision criteria). Includes capital reallocation framework and primary risk mitigation strategies.
+                </p>
+              </div>
+
+              {/* Operating Framework */}
+              <div style={{ background: "white", padding: "15px", border: "1px solid #3d6b54", borderLeft: "3px solid #3d6b54", marginBottom: 12 }}>
+                <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: "#3d6b54", marginBottom: 6 }}>OPERATING RHYTHM</div>
+                <p style={{ fontSize: 10.5, lineHeight: 1.6, color: "#2b2b2b", margin: 0 }}>
+                  Defines North Star metric predicting long-term success with current baseline and target trajectories. Establishes 2-3 supporting metrics with precise definitions, current values, and targets. Structures operating cadence across weekly (tactical decisions), monthly (strategic alignment), and quarterly (major pivots) rhythms. Identifies vanity metrics that mislead versus true indicators of business health.
+                </p>
+              </div>
+
+              {/* Investment Thesis */}
+              <div style={{ background: "white", padding: "15px", border: "1px solid #3d6b54", borderLeft: "3px solid #3d6b54" }}>
+                <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: "#3d6b54", marginBottom: 6 }}>INVESTMENT MEMO</div>
+                <p style={{ fontSize: 10.5, lineHeight: 1.6, color: "#2b2b2b", margin: 0 }}>
+                  Presents complete investment thesis using situation-complication-conviction framework. Establishes current market situation with quantified metrics, identifies structural complications creating opportunity, and builds conviction case through unique insights, market wedge, defensible moats, key metrics, and expected outcomes. Includes bear case analysis with primary risks and counter-arguments. Concludes with thesis summary projecting addressable market, 18-24 month milestones, valuation path, and risk factors requiring monitoring.
                 </p>
               </div>
             </div>
