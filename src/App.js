@@ -53,10 +53,17 @@ CRITICAL: When you use web_search, execute it - do NOT show the search syntax/co
 Write TIGHT narrative analysis - compressed but connected prose. Lead the reader to insights without over-explaining. Setup → Evidence → Implication pattern. Every sentence adds value. No memo format. Start with ## section headers immediately.`;
   const research = `CRITICAL: Use web_search tool extensively for current data. Search for: "${company} funding 2025", "${company} metrics 2025", "${company} competitors", "${company} news 2025". Cite sources inline: "According to Sacra March 2025" or "per TechCrunch July 2025". 
 
-At the very end, include sources in this EXACT format on a SINGLE LINE:
-**Sources:** Source1, Source2, Source3, Source4
+At the very end, include sources in this EXACT format - COPY THIS EXAMPLE:
 
-DO NOT put each source on a new line. DO NOT use bullet points. Comma-separated on one line only.`;
+**Sources:** TechCrunch July 2025, The Information March 2025, Sacra Research, Bloomberg, Forbes, company blog
+
+RULES FOR SOURCES LINE:
+- Must be ONE continuous line of text
+- Separate each source with a comma and space
+- NO line breaks between sources
+- NO bullet points
+- NO numbered lists
+- Just: **Sources:** source1, source2, source3, source4`;
   const rules = `CRITICAL STYLE: Connect thoughts just enough to lead reader to conclusion, but let THEM complete the thought. Remove "because", "which means", "this is important because" - keep transitions BETWEEN paragraphs, cut over-explanation WITHIN paragraphs. Pack concrete examples (3-5 per claim). Named companies with specific metrics. Match Erik Torenberg's analytical voice: sharp, substantive, connects dots without hand-holding.`;
 
   const prompts = {
@@ -282,12 +289,21 @@ async function callClaude(prompt, pdfs, signal, agentId = "signals") {
 
 function md(text) {
   if (!text) return "";
-  return text
+  
+  // First, fix the Sources line to ensure it's on one line
+  // Replace any newlines after **Sources:** with comma+space until we hit a blank line or end
+  let fixedText = text.replace(/\*\*Sources:\*\*([^\n]*(?:\n(?!\n)[^\n]*)*)/g, (match, sources) => {
+    // Remove all newlines within the sources section and replace with comma+space
+    const cleaned = sources.replace(/\n/g, ', ').replace(/,\s*,/g, ',').trim();
+    return `**Sources:** ${cleaned}`;
+  });
+  
+  return fixedText
     .replace(/^## (.+)$/gm, `<h3 class="agent-section-header" style="font-family:'Libre Baskerville',serif;font-size:14px;color:${P.forest};margin:16px 0 6px;border-bottom:1px solid ${P.sand};padding-bottom:4px;">$1</h3>`)
     .replace(/\*\*(.+?)\*\*/g, `<strong style="color:${P.ink};">$1</strong>`)
     .replace(/^- (.+)$/gm, `<div style="display:flex;gap:7px;margin:3px 0;"><span style="color:${P.terra};">▸</span><span>$1</span></div>`)
     .replace(/\n\n/g, `</p><p style="margin:6px 0;">`)
-    .replace(/\n/g, " ");  // Changed from <br/> to space - keeps sources inline
+    .replace(/\n/g, " ");
 }
 
 function AgentCard({ agent, status, result }) {
@@ -583,86 +599,70 @@ export default function App() {
       {appState === "done" && (
         <div style={{ display: "none" }} className="print-only print-content-area">
           {/* Synopsis Page */}
-          <div style={{ pageBreakAfter: "always", padding: "70px 50px 30px 50px" }}>
-            <div style={{ textAlign: "center", marginBottom: 25 }}>
-              <h1 style={{ fontFamily: "'Libre Baskerville', serif", fontSize: 32, fontWeight: 700, marginBottom: 8, color: "#1a3325", letterSpacing: "0.05em" }}>{company.toUpperCase()}</h1>
-              <p style={{ fontSize: 12, color: "#6b6b6b", marginBottom: 3 }}>7-Agent Parallel Intelligence Analysis</p>
+          <div style={{ pageBreakAfter: "always", padding: "70px 50px 20px 50px" }}>
+            <div style={{ textAlign: "center", marginBottom: 20 }}>
+              <h1 style={{ fontFamily: "'Libre Baskerville', serif", fontSize: 32, fontWeight: 700, marginBottom: 6, color: "#1a3325", letterSpacing: "0.05em" }}>{company.toUpperCase()}</h1>
+              <p style={{ fontSize: 12, color: "#6b6b6b", marginBottom: 2 }}>7-Agent Parallel Intelligence Analysis</p>
               <p style={{ fontSize: 10, color: "#9a9a9a" }}>Generated {new Date().toLocaleDateString()} • Powered by Claude</p>
             </div>
 
-            <div style={{ background: "#faf8f4", border: "2px solid #1a3325", borderRadius: 4, padding: "20px 25px", marginBottom: 25, pageBreakInside: "avoid" }}>
-              <h2 style={{ fontFamily: "'Libre Baskerville', serif", fontSize: 16, color: "#1a3325", marginBottom: 15, textAlign: "center", borderBottom: "1px solid #9b8c78", paddingBottom: 8 }}>EXECUTIVE SYNOPSIS</h2>
+            <div style={{ background: "#faf8f4", border: "2px solid #1a3325", borderRadius: 4, padding: "15px 20px", marginBottom: 18, pageBreakInside: "avoid" }}>
+              <h2 style={{ fontFamily: "'Libre Baskerville', serif", fontSize: 14, color: "#1a3325", marginBottom: 12, textAlign: "center", borderBottom: "1px solid #9b8c78", paddingBottom: 6 }}>EXECUTIVE SYNOPSIS</h2>
               
               {/* The Verdict */}
-              <div style={{ marginBottom: 18, padding: "15px", background: "white", border: "1px solid #d4724a", borderLeft: "3px solid #d4724a" }}>
-                <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: "#d4724a", marginBottom: 6 }}>THE VERDICT</div>
-                <p style={{ fontSize: 11.5, lineHeight: 1.6, color: "#2b2b2b", margin: 0, marginBottom: 8 }}>
-                  This comprehensive strategic analysis examines {company}'s market position through 7 parallel intelligence agents operating simultaneously. The analysis synthesizes current market data, competitive dynamics, and strategic frameworks to provide actionable insights across market signals, competitive landscape, channel efficiency, customer segmentation, go-to-market strategy, operating metrics, and investment thesis.
+              <div style={{ marginBottom: 12, padding: "12px", background: "white", border: "1px solid #d4724a", borderLeft: "3px solid #d4724a" }}>
+                <div style={{ fontSize: 8, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: "#d4724a", marginBottom: 4 }}>THE VERDICT</div>
+                <p style={{ fontSize: 10, lineHeight: 1.5, color: "#2b2b2b", margin: 0, marginBottom: 6 }}>
+                  This comprehensive strategic analysis examines {company}'s market position through 7 parallel intelligence agents. Analysis synthesizes current market data, competitive dynamics, and strategic frameworks across market signals, competitive landscape, channel efficiency, customer segmentation, go-to-market strategy, operating metrics, and investment thesis.
                 </p>
-                <p style={{ fontSize: 11, lineHeight: 1.6, color: "#2b2b2b", margin: 0 }}>
-                  Each agent conducts independent research using web search for 2025-2026 data, competitive intelligence databases, and strategic frameworks. Wave 1 agents (Market Signals, Competitive, Channels, Segments) establish foundational analysis. Wave 2 agents (GTM Blueprint, Operating Rhythm, Investment Memo) synthesize findings into strategic recommendations and investment thesis.
+                <p style={{ fontSize: 9.5, lineHeight: 1.5, color: "#2b2b2b", margin: 0 }}>
+                  Wave 1 agents establish foundational analysis. Wave 2 agents synthesize findings into strategic recommendations and investment thesis.
                 </p>
               </div>
 
               {/* Key Findings Grid */}
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px", marginBottom: 18 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: 12 }}>
                 <div>
-                  <div style={{ fontSize: 8, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: "#3d6b54", marginBottom: 5, paddingBottom: 3, borderBottom: "1px solid #d4c4a8" }}>◉ MARKET SIGNALS</div>
-                  <p style={{ fontSize: 10, lineHeight: 1.5, color: "#4a4a4a", margin: 0 }}>
-                    Examines category positioning, business model economics, and market opportunity. Analyzes unit economics across customer tiers, capital environment including recent funding rounds and valuation multiples, competitive pressure points, and structural market risks. Identifies contrarian insights by analyzing what market bulls underestimate and what bears overestimate in current positioning.
+                  <div style={{ fontSize: 7.5, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: "#3d6b54", marginBottom: 4, paddingBottom: 2, borderBottom: "1px solid #d4c4a8" }}>◉ MARKET SIGNALS</div>
+                  <p style={{ fontSize: 9, lineHeight: 1.4, color: "#4a4a4a", margin: 0 }}>
+                    Category positioning, business model economics, unit economics across tiers, capital environment with funding/valuation, competitive pressure, structural risks. Contrarian insights analyzing what bulls underestimate and bears overestimate.
                   </p>
                 </div>
 
                 <div>
-                  <div style={{ fontSize: 8, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: "#3d6b54", marginBottom: 5, paddingBottom: 3, borderBottom: "1px solid #d4c4a8" }}>◉ COMPETITIVE LANDSCAPE</div>
-                  <p style={{ fontSize: 10, lineHeight: 1.5, color: "#4a4a4a", margin: 0 }}>
-                    Maps competitive set with positioning analysis and funding multiples. Identifies specific areas where {company} establishes defensible moats versus structural weaknesses exploitable by competitors. Examines substitution risks from technology shifts, changing user behaviors, and adjacent category convergence. Analyzes funding gaps and capital advantages versus competitive set.
+                  <div style={{ fontSize: 7.5, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: "#3d6b54", marginBottom: 4, paddingBottom: 2, borderBottom: "1px solid #d4c4a8" }}>◉ COMPETITIVE LANDSCAPE</div>
+                  <p style={{ fontSize: 9, lineHeight: 1.4, color: "#4a4a4a", margin: 0 }}>
+                    Competitive set mapping with positioning and multiples. Areas where {company} wins with defensible moats versus structural weaknesses. Substitution risks from technology shifts and adjacent convergence. Funding dynamics versus competitors.
                   </p>
                 </div>
 
                 <div>
-                  <div style={{ fontSize: 8, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: "#3d6b54", marginBottom: 5, paddingBottom: 3, borderBottom: "1px solid #d4c4a8" }}>◉ CHANNEL STRATEGY</div>
-                  <p style={{ fontSize: 10, lineHeight: 1.5, color: "#4a4a4a", margin: 0 }}>
-                    Analyzes current channel mix and concentration risk across acquisition channels. Evaluates efficiency metrics including CAC by channel, conversion rates, and payback periods. Develops reallocation thesis for capital deployment with expected ROI across channels. Identifies critical platform dependencies and channel failure modes that could disrupt growth trajectory.
+                  <div style={{ fontSize: 7.5, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: "#3d6b54", marginBottom: 4, paddingBottom: 2, borderBottom: "1px solid #d4c4a8" }}>◉ CHANNEL STRATEGY</div>
+                  <p style={{ fontSize: 9, lineHeight: 1.4, color: "#4a4a4a", margin: 0 }}>
+                    Current channel mix and concentration risk. Efficiency metrics: CAC by channel, conversion rates, payback periods. Reallocation thesis with expected ROI. Platform dependencies and channel failure modes.
                   </p>
                 </div>
 
                 <div>
-                  <div style={{ fontSize: 8, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: "#3d6b54", marginBottom: 5, paddingBottom: 3, borderBottom: "1px solid #d4c4a8" }}>◉ CUSTOMER SEGMENTS</div>
-                  <p style={{ fontSize: 10, lineHeight: 1.5, color: "#4a4a4a", margin: 0 }}>
-                    Profiles core customer segments with TAM sizing, unit economics, and adoption proof points. Identifies underserved adjacent markets representing whitespace opportunities with analysis of current barriers. Explores entirely new segment possibilities and requirements for unlock. Provides sequencing strategy for segment expansion with timing and resource allocation recommendations.
+                  <div style={{ fontSize: 7.5, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: "#3d6b54", marginBottom: 4, paddingBottom: 2, borderBottom: "1px solid #d4c4a8" }}>◉ CUSTOMER SEGMENTS</div>
+                  <p style={{ fontSize: 9, lineHeight: 1.4, color: "#4a4a4a", margin: 0 }}>
+                    Core segments: TAM sizing, unit economics, proof points. Underserved adjacencies and whitespace opportunities with unlock requirements. Sequencing strategy for segment expansion with timing and resource allocation.
                   </p>
                 </div>
               </div>
 
-              {/* Strategic Synthesis */}
-              <div style={{ background: "white", padding: "15px", border: "1px solid #3d6b54", borderLeft: "3px solid #3d6b54", marginBottom: 12 }}>
-                <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: "#3d6b54", marginBottom: 6 }}>GTM BLUEPRINT</div>
-                <p style={{ fontSize: 10.5, lineHeight: 1.6, color: "#2b2b2b", margin: 0 }}>
-                  Synthesizes Wave 1 findings into actionable go-to-market strategy. Identifies what's working (validated approaches to keep and scale), what's broken (initiatives to kill and reallocate resources), and strategic bets (new initiatives with specific investment levels, success gates, and go/no-go decision criteria). Includes capital reallocation framework and primary risk mitigation strategies.
-                </p>
-              </div>
-
-              {/* Operating Framework */}
-              <div style={{ background: "white", padding: "15px", border: "1px solid #3d6b54", borderLeft: "3px solid #3d6b54", marginBottom: 12 }}>
-                <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: "#3d6b54", marginBottom: 6 }}>OPERATING RHYTHM</div>
-                <p style={{ fontSize: 10.5, lineHeight: 1.6, color: "#2b2b2b", margin: 0 }}>
-                  Defines North Star metric predicting long-term success with current baseline and target trajectories. Establishes 2-3 supporting metrics with precise definitions, current values, and targets. Structures operating cadence across weekly (tactical decisions), monthly (strategic alignment), and quarterly (major pivots) rhythms. Identifies vanity metrics that mislead versus true indicators of business health.
-                </p>
-              </div>
-
-              {/* Investment Thesis */}
-              <div style={{ background: "white", padding: "15px", border: "1px solid #3d6b54", borderLeft: "3px solid #3d6b54" }}>
-                <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: "#3d6b54", marginBottom: 6 }}>INVESTMENT MEMO</div>
-                <p style={{ fontSize: 10.5, lineHeight: 1.6, color: "#2b2b2b", margin: 0 }}>
-                  Presents complete investment thesis using situation-complication-conviction framework. Establishes current market situation with quantified metrics, identifies structural complications creating opportunity, and builds conviction case through unique insights, market wedge, defensible moats, key metrics, and expected outcomes. Includes bear case analysis with primary risks and counter-arguments. Concludes with thesis summary projecting addressable market, 18-24 month milestones, valuation path, and risk factors requiring monitoring.
+              {/* Strategic Synthesis - Combined */}
+              <div style={{ background: "white", padding: "10px", border: "1px solid #3d6b54", borderLeft: "3px solid #3d6b54" }}>
+                <div style={{ fontSize: 8, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: "#3d6b54", marginBottom: 4 }}>STRATEGIC SYNTHESIS</div>
+                <p style={{ fontSize: 9, lineHeight: 1.4, color: "#2b2b2b", margin: 0 }}>
+                  <strong>GTM Blueprint:</strong> What's working to scale, what's broken to kill, strategic bets with gates. <strong>Operating Rhythm:</strong> North Star metric, 2-3 supporting metrics, weekly/monthly/quarterly cadence. <strong>Investment Thesis:</strong> Situation-complication-conviction framework with bear case and valuation path.
                 </p>
               </div>
             </div>
 
-            <div style={{ textAlign: "center", padding: "15px", background: "#f5f2ed", borderRadius: 4 }}>
-              <p style={{ fontSize: 10, color: "#6b6b6b", lineHeight: 1.5, margin: 0 }}>
-                <strong style={{ color: "#1a3325" }}>The following pages</strong> present detailed findings from 7 parallel intelligence agents. Each agent synthesized web research, competitive data, and strategic frameworks.
+            <div style={{ textAlign: "center", padding: "10px", background: "#f5f2ed", borderRadius: 4 }}>
+              <p style={{ fontSize: 9, color: "#6b6b6b", lineHeight: 1.4, margin: 0 }}>
+                <strong style={{ color: "#1a3325" }}>The following pages</strong> present detailed findings from 7 parallel intelligence agents.
               </p>
             </div>
           </div>
