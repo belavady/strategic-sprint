@@ -5,7 +5,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 // NO TABS - Single page with sprint functionality  
 // ═══════════════════════════════════════════════════════
 
-const MOCK_MODE = false;
+const MOCK_MODE = true;
 const GA4_ID = "G-XXXXXXXXXX";
 
 const gaEvent = (name, params = {}) => {
@@ -278,7 +278,7 @@ function md(text) {
     .replace(/\*\*(.+?)\*\*/g, `<strong style="color:${P.ink};">$1</strong>`)
     .replace(/^- (.+)$/gm, `<div style="display:flex;gap:7px;margin:3px 0;"><span style="color:${P.terra};">▸</span><span>$1</span></div>`)
     .replace(/\n\n/g, `</p><p style="margin:6px 0;">`)
-    .replace(/\n/g, "<br/>");
+    .replace(/\n/g, " ");  // Changed from <br/> to space - keeps sources inline
 }
 
 function AgentCard({ agent, status, result }) {
@@ -584,17 +584,50 @@ export default function App() {
             <div style={{ background: "#faf8f4", border: "2px solid #1a3325", borderRadius: 4, padding: "20px 25px", marginBottom: 25, pageBreakInside: "avoid" }}>
               <h2 style={{ fontFamily: "'Libre Baskerville', serif", fontSize: 16, color: "#1a3325", marginBottom: 15, textAlign: "center", borderBottom: "1px solid #9b8c78", paddingBottom: 8 }}>EXECUTIVE SYNOPSIS</h2>
               
+              {/* The Verdict */}
               <div style={{ marginBottom: 18, padding: "15px", background: "white", border: "1px solid #d4724a", borderLeft: "3px solid #d4724a" }}>
                 <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: "#d4724a", marginBottom: 6 }}>THE VERDICT</div>
                 <p style={{ fontSize: 11.5, lineHeight: 1.6, color: "#2b2b2b", margin: 0 }}>
-                  This 7-agent parallel intelligence analysis examines {company}'s market position, competitive landscape, channel strategy, customer segments, go-to-market approach, operating metrics, and investment thesis. The analysis synthesizes current market data, competitive dynamics, and strategic insights to provide a comprehensive view of opportunities and risks.
+                  Comprehensive strategic analysis examining {company}'s market position, competitive dynamics, and growth trajectory. Analysis synthesizes current market data, competitive intelligence, channel efficiency, customer segmentation, go-to-market strategy, operating metrics, and investment thesis to identify key opportunities and strategic risks.
                 </p>
               </div>
 
-              <div style={{ marginBottom: 18, padding: "15px", background: "white", border: "1px solid #3d6b54", borderLeft: "3px solid #3d6b54" }}>
-                <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: "#3d6b54", marginBottom: 6 }}>ANALYSIS COMPLETE</div>
+              {/* Key Findings Grid */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px", marginBottom: 18 }}>
+                <div>
+                  <div style={{ fontSize: 8, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: "#3d6b54", marginBottom: 5, paddingBottom: 3, borderBottom: "1px solid #d4c4a8" }}>◉ MARKET SIGNALS</div>
+                  <p style={{ fontSize: 10, lineHeight: 1.5, color: "#4a4a4a", margin: 0 }}>
+                    Analysis of market opportunity, unit economics across customer tiers, capital environment, and competitive threats. Identifies contrarian insights missed by bulls and bears.
+                  </p>
+                </div>
+
+                <div>
+                  <div style={{ fontSize: 8, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: "#3d6b54", marginBottom: 5, paddingBottom: 3, borderBottom: "1px solid #d4c4a8" }}>◉ COMPETITIVE</div>
+                  <p style={{ fontSize: 10, lineHeight: 1.5, color: "#4a4a4a", margin: 0 }}>
+                    Competitive positioning map showing where {company} wins and loses. Examines moat defensibility, substitution risks, and funding dynamics versus competitors.
+                  </p>
+                </div>
+
+                <div>
+                  <div style={{ fontSize: 8, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: "#3d6b54", marginBottom: 5, paddingBottom: 3, borderBottom: "1px solid #d4c4a8" }}>◉ CHANNELS</div>
+                  <p style={{ fontSize: 10, lineHeight: 1.5, color: "#4a4a4a", margin: 0 }}>
+                    Channel mix efficiency analysis, CAC by channel, and strategic reallocation opportunities. Identifies platform dependencies and critical growth risks.
+                  </p>
+                </div>
+
+                <div>
+                  <div style={{ fontSize: 8, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: "#3d6b54", marginBottom: 5, paddingBottom: 3, borderBottom: "1px solid #d4c4a8" }}>◉ SEGMENTS</div>
+                  <p style={{ fontSize: 10, lineHeight: 1.5, color: "#4a4a4a", margin: 0 }}>
+                    Core customer segments, underserved adjacencies, and whitespace opportunities. Includes segment sequencing strategy and Pareto analysis of value concentration.
+                  </p>
+                </div>
+              </div>
+
+              {/* Strategic Recommendation */}
+              <div style={{ background: "white", padding: "15px", border: "1px solid #3d6b54", borderLeft: "3px solid #3d6b54" }}>
+                <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: "#3d6b54", marginBottom: 6 }}>STRATEGIC SYNTHESIS</div>
                 <p style={{ fontSize: 10.5, lineHeight: 1.6, color: "#2b2b2b", margin: 0 }}>
-                  Review the detailed findings from each agent below. The analysis covers market signals, competitive positioning, channel efficiency, customer segmentation, GTM strategy, operating rhythm, and investment considerations.
+                  GTM blueprint synthesizes findings into actionable strategy. Operating rhythm defines North Star metric and supporting KPIs. Investment thesis presents situation-complication-conviction framework with bear case analysis and valuation path.
                 </p>
               </div>
             </div>
