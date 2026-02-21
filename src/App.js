@@ -411,7 +411,8 @@ export default function App() {
     for (const id of W2) {
       if (ctrl.signal.aborted) return;
       setStatuses(s => ({ ...s, [id]: "running" }));
-      await runAgent(id, makePrompt(id, company, ctx, synthCtx), ctrl.signal, pdfs);
+      const text = await runAgent(id, makePrompt(id, company, ctx, synthCtx), ctrl.signal, pdfs);
+      newResults[id] = text;
       await new Promise(r => setTimeout(r, 1500));
     }
 
@@ -419,7 +420,7 @@ export default function App() {
     if (!ctrl.signal.aborted) {
       setStatuses(s => ({ ...s, synopsis: "running" }));
       const allAgentResults = AGENTS.map(a => {
-        const result = results[a.id] || "";
+        const result = newResults[a.id] || "";
         return `\n━━━ ${a.label.toUpperCase()} ━━━\n${result}`;
       }).join('\n\n');
 
@@ -553,15 +554,22 @@ Start directly with the content. Do NOT include "Here is the synopsis" or explan
             max-height: none !important; 
             overflow: visible !important;
           }
-          /* Apply padding to ALL elements inside agent-content */
+          /* Maximum aggressive padding - apply to ALL possible elements */
           .agent-content > *,
           .agent-content p,
           .agent-content h3,
           .agent-content div,
           .agent-content strong,
+          .agent-content span,
           .agent-section-header {
-            padding-top: 100px !important;
-            margin-top: -94px !important;
+            padding-top: 110px !important;
+            margin-top: -104px !important;
+          }
+          /* Extra protection for first elements */
+          .agent-content > *:first-child,
+          .agent-content p:first-of-type {
+            padding-top: 110px !important;
+            margin-top: -104px !important;
           }
           h2 {
             page-break-after: avoid !important;
