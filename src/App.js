@@ -349,8 +349,8 @@ function md(text) {
   }
   
   // Regular content (agent analysis)
-  return '<p style="margin:6px 0;padding-top:110px;margin-top:-104px;">' + fixedText
-    .replace(/^## (.+)$/gm, `</p><h3 class="agent-section-header" style="font-family:'Libre Baskerville',serif;font-size:14px;color:${P.forest};margin:16px 0 6px;border-bottom:1px solid ${P.sand};padding-bottom:4px;padding-top:110px;margin-top:-104px;">$1</h3><p style="margin:6px 0;">`)
+  return '<p style="margin:6px 0;">' + fixedText
+    .replace(/^## (.+)$/gm, `</p><h3 class="agent-section-header" style="font-family:'Libre Baskerville',serif;font-size:14px;color:${P.forest};margin:16px 0 6px;border-bottom:1px solid ${P.sand};padding-bottom:4px;">$1</h3><p style="margin:6px 0;">`)
     .replace(/\*\*(.+?)\*\*/g, `<strong style="color:${P.ink};">$1</strong>`)
     .replace(/^- (.+)$/gm, `<div style="display:flex;gap:7px;margin:3px 0;"><span style="color:${P.terra};">▸</span><span>$1</span></div>`)
     .replace(/\n\n/g, `</p><p style="margin:6px 0;">`)
@@ -621,26 +621,7 @@ Start directly with the content. Do NOT include "Here is the synopsis" or explan
             padding-top: 110px !important;
             margin-top: -104px !important;
           }
-          /* Maximum aggressive padding - apply to ALL possible elements */
-          .agent-content *,
-          .agent-content > *,
-          .agent-content p,
-          .agent-content h3,
-          .agent-content div,
-          .agent-content strong,
-          .agent-content span,
-          .agent-content em,
-          .agent-section-header {
-            padding-top: 110px !important;
-            margin-top: -104px !important;
-          }
-          /* Extra protection for first elements */
-          .agent-content > *:first-child,
-          .agent-content p:first-of-type,
-          .agent-content h3:first-of-type {
-            padding-top: 110px !important;
-            margin-top: -104px !important;
-          }
+          /* DO NOT add padding to child elements - it creates conflicts */
           h2 {
             page-break-after: avoid !important;
             page-break-inside: avoid !important;
