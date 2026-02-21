@@ -618,21 +618,26 @@ Start directly with the content. Do NOT include "Here is the synopsis" or explan
           .agent-content { 
             max-height: none !important; 
             overflow: visible !important;
+            padding-top: 110px !important;
+            margin-top: -104px !important;
           }
           /* Maximum aggressive padding - apply to ALL possible elements */
+          .agent-content *,
           .agent-content > *,
           .agent-content p,
           .agent-content h3,
           .agent-content div,
           .agent-content strong,
           .agent-content span,
+          .agent-content em,
           .agent-section-header {
             padding-top: 110px !important;
             margin-top: -104px !important;
           }
           /* Extra protection for first elements */
           .agent-content > *:first-child,
-          .agent-content p:first-of-type {
+          .agent-content p:first-of-type,
+          .agent-content h3:first-of-type {
             padding-top: 110px !important;
             margin-top: -104px !important;
           }
@@ -813,7 +818,7 @@ Start directly with the content. Do NOT include "Here is the synopsis" or explan
                   </div>
                 </div>
                 
-                <div className="agent-content" style={{ fontSize: 11.5, lineHeight: 1.8, color: "#2b2b2b", paddingTop: "110px", marginTop: "-104px" }} dangerouslySetInnerHTML={{ __html: md(result) }} />
+                <div className="agent-content" style={{ fontSize: 11.5, lineHeight: 1.8, color: "#2b2b2b" }} dangerouslySetInnerHTML={{ __html: md(result) }} />
               </div>
             );
           })}
