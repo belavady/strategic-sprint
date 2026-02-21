@@ -426,10 +426,7 @@ export default function App() {
         @keyframes pulse { 0%, 100% { opacity: .4; } 50% { opacity: 1; } }
         @media print {
           @page { 
-            margin-top: 1in;
-            margin-bottom: 0.5in;
-            margin-left: 0;
-            margin-right: 0;
+            margin: 0;
           }
           body { 
             background: white !important; 
@@ -458,6 +455,10 @@ export default function App() {
           .agent-content { 
             max-height: none !important; 
             overflow: visible !important; 
+          }
+          .agent-content * {
+            padding-top: 70px !important;
+            margin-top: -64px !important;
           }
           h2 {
             page-break-after: avoid !important;
