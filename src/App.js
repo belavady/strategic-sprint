@@ -298,20 +298,62 @@ function md(text) {
     return `**Sources:** ${cleaned}`;
   });
   
+  // Remove markdown heading
+  fixedText = fixedText.replace(/^#+ EXECUTIVE SYNOPSIS\s*\n/gm, '');
+  
+  // Check if this is synopsis content (has THE VERDICT)
+  const isSynopsis = fixedText.includes('**THE VERDICT**');
+  
+  if (isSynopsis) {
+    // Handle synopsis with special layout
+    let html = '';
+    
+    // Extract THE VERDICT
+    const verdictMatch = fixedText.match(/\*\*THE VERDICT\*\*\s*\n(.+?)(?=\n◉)/s);
+    if (verdictMatch) {
+      html += `<div style="margin-bottom:16px;padding:14px;background:white;border:1px solid #d4724a;border-left:3px solid #d4724a">
+        <div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#d4724a;margin-bottom:5px">THE VERDICT</div>
+        <p style="font-size:11px;line-height:1.5;color:#2b2b2b;margin:0">${verdictMatch[1].trim()}</p>
+      </div>`;
+    }
+    
+    // Extract all ◉ sections
+    const sections = [];
+    const sectionRegex = /◉ ([A-Z\s&]+)\s*\n(.+?)(?=\n◉|$)/gs;
+    let match;
+    while ((match = sectionRegex.exec(fixedText)) !== null) {
+      sections.push({ title: match[1].trim(), content: match[2].trim() });
+    }
+    
+    // Wave 1: First 4 sections in 2x2 grid
+    if (sections.length >= 4) {
+      html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">';
+      for (let i = 0; i < 4; i++) {
+        html += `<div style="padding:11px;background:white;border:1px solid #3d6b54;border-left:3px solid #3d6b54">
+          <div style="font-size:8px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:#3d6b54;margin-bottom:5px">◉ ${sections[i].title}</div>
+          <p style="font-size:9px;line-height:1.45;color:#4a4a4a;margin:0">${sections[i].content}</p>
+        </div>`;
+      }
+      html += '</div>';
+    }
+    
+    // Wave 2: Remaining sections row-wise
+    for (let i = 4; i < sections.length; i++) {
+      html += `<div style="margin-bottom:10px;padding:12px;background:white;border:1px solid #3d6b54;border-left:3px solid #3d6b54">
+        <div style="font-size:8px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:#3d6b54;margin-bottom:5px">◉ ${sections[i].title}</div>
+        <p style="font-size:9.5px;line-height:1.5;color:#4a4a4a;margin:0">${sections[i].content}</p>
+      </div>`;
+    }
+    
+    return html;
+  }
+  
+  // Regular content (agent analysis)
   return fixedText
-    // Handle **THE VERDICT** specially for synopsis
-    .replace(/\*\*THE VERDICT\*\*/g, `<div style="margin-bottom:16px;padding:14px;background:white;border:1px solid #d4724a;border-left:3px solid #d4724a"><div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#d4724a;margin-bottom:5px">THE VERDICT</div><p style="font-size:11px;line-height:1.55;color:#2b2b2b;margin:0">`)
-    // Handle ◉ sections for synopsis
-    .replace(/◉ ([A-Z\s]+)\n/g, `</p></div><div style="margin-bottom:12px;padding:12px;background:white;border:1px solid #3d6b54;border-left:3px solid #3d6b54"><div style="font-size:8px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#3d6b54;margin-bottom:5px">◉ $1</div><p style="font-size:9.5px;line-height:1.5;color:#4a4a4a;margin:0">`)
-    // Regular h3 section headers
     .replace(/^## (.+)$/gm, `<h3 class="agent-section-header" style="font-family:'Libre Baskerville',serif;font-size:14px;color:${P.forest};margin:16px 0 6px;border-bottom:1px solid ${P.sand};padding-bottom:4px;">$1</h3>`)
-    // Bold text
     .replace(/\*\*(.+?)\*\*/g, `<strong style="color:${P.ink};">$1</strong>`)
-    // Bullet points
     .replace(/^- (.+)$/gm, `<div style="display:flex;gap:7px;margin:3px 0;"><span style="color:${P.terra};">▸</span><span>$1</span></div>`)
-    // Paragraphs
     .replace(/\n\n/g, `</p><p style="margin:6px 0;">`)
-    // Line breaks
     .replace(/\n/g, " ");
 }
 
@@ -450,25 +492,34 @@ Your synopsis must tell a STORY with narrative arc:
 
 STRUCTURE:
 
-**THE VERDICT** (75-100 words)
-Open with the single most contrarian or surprising insight that reframes how to think about ${company}. Lead with specific data. Make it impossible to ignore.
+**THE VERDICT** (70-85 words)
+Open with the single most contrarian insight that reframes thinking about ${company}. Lead with specific data. Make it impossible to ignore.
 
-**KEY FINDINGS** (Five sections covering ALL 7 agents, 60-80 words each)
+**KEY FINDINGS** (Four sections for Wave 1 in 2x2 grid, two sections for Wave 2 full-width)
+
+Wave 1 sections (45-55 words each - MUST be concise for grid layout):
 
 ◉ MARKET SIGNALS
-[Most contrarian market insight with specific metrics from Market Signals agent]
+[Most contrarian market insight with 1-2 key metrics - 45-55 words max]
 
-◉ COMPETITIVE LANDSCAPE
-[Hidden competitive reality from Competitive agent with competitor names and data]
+◉ COMPETITIVE LANDSCAPE  
+[Hidden competitive reality with competitor names - 45-55 words max]
 
-◉ GROWTH DYNAMICS
-[Synthesize Channels + Segments agents: what's working/broken with CAC/conversion data]
+◉ CHANNELS
+[Channel efficiency insight with CAC data - 45-55 words max]
+
+◉ SEGMENTS
+[Customer segment opportunity with TAM/LTV data - 45-55 words max]
+
+Wave 2 sections (60-70 words each - can be slightly longer as full-width):
 
 ◉ GTM & OPERATIONS
-[Synthesize GTM Blueprint + Operating Rhythm agents: strategic bet and North Star metric]
+[Synthesize GTM Blueprint + Operating Rhythm: key strategic bet and North Star metric - 60-70 words]
 
 ◉ INVESTMENT THESIS
-[Pull from Investment Memo: the conviction case and expected outcome with timeline]
+[From Investment Memo: conviction case and expected outcome with valuation path - 60-70 words]
+
+CRITICAL: Keep Wave 1 sections TIGHT (45-55 words) so 2x2 grid fits on page. Wave 2 can be slightly longer.
 
 STYLE REQUIREMENTS:
 
@@ -714,7 +765,7 @@ Start directly with the content. Do NOT include "Here is the synopsis" or explan
             <div style={{ textAlign: "center", marginBottom: 22 }}>
               <h1 style={{ fontFamily: "'Libre Baskerville', serif", fontSize: 32, fontWeight: 700, marginBottom: 8, color: "#1a3325", letterSpacing: "0.05em" }}>{company.toUpperCase()}</h1>
               <p style={{ fontSize: 12, color: "#6b6b6b", marginBottom: 3 }}>7-Agent Parallel Intelligence Analysis</p>
-              <p style={{ fontSize: 10, color: "#9a9a9a" }}>Generated {new Date().toLocaleDateString()} • Powered by Claude</p>
+              <p style={{ fontSize: 10, color: "#9a9a9a" }}>Generated {new Date().toLocaleDateString()} in {formatTime(elapsed)}</p>
             </div>
 
             <div style={{ background: "#faf8f4", border: "2px solid #1a3325", borderRadius: 4, padding: "18px 22px", marginBottom: 20, pageBreakInside: "avoid" }}>
