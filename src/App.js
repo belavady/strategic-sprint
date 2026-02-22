@@ -618,10 +618,13 @@ Start directly with the content. Do NOT include "Here is the synopsis" or explan
           .agent-content { 
             max-height: none !important; 
             overflow: visible !important;
+          }
+          /* Apply padding ONLY to block elements that could start a page */
+          .agent-content p,
+          .agent-content h3 {
             padding-top: 110px !important;
             margin-top: -104px !important;
           }
-          /* DO NOT add padding to child elements - it creates conflicts */
           h2 {
             page-break-after: avoid !important;
             page-break-inside: avoid !important;
@@ -758,7 +761,7 @@ Start directly with the content. Do NOT include "Here is the synopsis" or explan
             <div style={{ textAlign: "center", marginBottom: 18 }}>
               <h1 style={{ fontFamily: "'Libre Baskerville', serif", fontSize: 32, fontWeight: 700, marginBottom: 8, color: "#1a3325", letterSpacing: "0.05em" }}>{company.toUpperCase()}</h1>
               <p style={{ fontSize: 12, color: "#6b6b6b", marginBottom: 3 }}>7-Agent Parallel Intelligence Analysis</p>
-              <p style={{ fontSize: 10, color: "#9a9a9a" }}>Generated {new Date().toLocaleDateString()} in {formatTime(elapsed)} Minutes</p>
+              <p style={{ fontSize: 10, color: "#9a9a9a" }}>Generated {new Date().toLocaleDateString()} in {formatTime(elapsed)}</p>
             </div>
 
             <div style={{ background: "#faf8f4", border: "2px solid #1a3325", borderRadius: 4, padding: "14px 18px", marginBottom: 14 }}>
