@@ -774,7 +774,7 @@ Start directly with the content. Do NOT include "Here is the synopsis" or explan
           <div style={{ padding: "70px 50px 20px 50px", pageBreakAfter: "always" }}>
             <div style={{ textAlign: "center", marginBottom: 18 }}>
               <h1 style={{ fontFamily: "'Libre Baskerville', serif", fontSize: 32, fontWeight: 700, marginBottom: 8, color: "#1a3325", letterSpacing: "0.05em" }}>{company.toUpperCase()}</h1>
-              <p style={{ fontSize: 12, color: "#6b6b6b", marginBottom: 3 }}>7-Agent Parallel Intelligence Analysis</p>
+              <p style={{ fontSize: 12, color: "#6b6b6b", marginBottom: 3 }}>8-Agentic AI Analysis</p>
               <p style={{ fontSize: 10, color: "#9a9a9a" }}>Generated {new Date().toLocaleDateString()} in {formatTime(elapsed)} Minutes</p>
             </div>
 
