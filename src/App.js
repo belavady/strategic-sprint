@@ -500,48 +500,60 @@ Your synopsis must tell a STORY with narrative arc:
 
 STRUCTURE:
 
-**THE VERDICT** (60-70 words MAXIMUM - this is a HARD LIMIT)
-Open with the single most contrarian insight. Lead with specific data. Make it impossible to ignore.
+**THE VERDICT** (75-85 words - increased for deeper insight)
+Open with the single most contrarian insight backed by specific data. Frame as analytical tension, not conclusion. Make it impossible to ignore.
 
 **KEY FINDINGS** (Four sections for Wave 1 in 2x2 grid, two sections for Wave 2 full-width)
 
-Wave 1 sections (35-45 words MAXIMUM per section - HARD LIMIT for grid layout):
+Wave 1 sections (40-50 words per section - increased for more specificity):
 
 ◉ MARKET SIGNALS
-[Most contrarian market insight with 1-2 key metrics - 35-45 words MAXIMUM]
+[Most contrarian market insight with 2-3 specific metrics and year-over-year trends - 40-50 words]
 
 ◉ COMPETITIVE LANDSCAPE  
-[Hidden competitive reality with competitor names - 35-45 words MAXIMUM]
+[Hidden competitive reality with specific competitor names and comparative data points - 40-50 words]
 
 ◉ CHANNELS
-[Channel efficiency insight with CAC data - 35-45 words MAXIMUM]
+[Channel efficiency insight with specific CAC, LTV, and payback period data - 40-50 words]
 
 ◉ SEGMENTS
-[Customer segment opportunity with TAM/LTV data - 35-45 words MAXIMUM]
+[Customer segment opportunity with specific TAM penetration and LTV comparisons - 40-50 words]
 
-Wave 2 sections (50-60 words MAXIMUM per section - HARD LIMIT):
+Wave 2 sections (60-75 words per section - increased for strategic depth):
 
 ◉ GTM & OPERATIONS
-[Synthesize GTM Blueprint + Operating Rhythm: key strategic bet and North Star metric - 50-60 words MAXIMUM]
+[Synthesize GTM Blueprint + Operating Rhythm: specific strategic bet with dollar amounts, timelines, and North Star metric with current/target - 60-75 words]
 
 ◉ INVESTMENT THESIS
-[From Investment Memo: conviction case and expected outcome with valuation path - 50-60 words MAXIMUM]
+[From Investment Memo: conviction case with specific valuation multiples, revenue projections, exit path, and timeline - 60-75 words]
 
-CRITICAL: These word limits are HARD MAXIMUMS. Going over will break the page layout. Count your words and stay under limits.
-Total synopsis: 290-350 words MAX.
+Total synopsis: 355-435 words (increased for deeper analysis while still fitting one page).
+
+TONE REQUIREMENTS (CRITICAL):
+
+✓ ANALYTICAL, not sensational - avoid "death spiral," "doomed," "crisis"
+✓ Frame as TENSIONS not CONCLUSIONS - "trapped between X and Y" not "failing at X"
+✓ Lead with METRICS not ADJECTIVES - "15%→50% attachment" not "explosive growth"
+✓ Present BOTH SIDES - "X suggests strength, but Y reveals vulnerability"
+✓ Use "migration in progress" not "inevitable outcome"
+✓ Be PROVOCATIVE but CREDIBLE - make readers think, not dismiss
+✓ Specific numbers > vague percentages > qualitative adjectives
 
 STYLE REQUIREMENTS:
 
 ✓ Write in tight, connected prose—not bullets or lists
 ✓ Lead each section with insight, not description
-✓ Use "According to [source]" or "per [data]" for credibility
+✓ Cite specific sources, competitors, metrics
 ✓ Create flow: each section sets up the next
-✓ Remove hedge words (seems, appears, suggests)—be definitive
+✓ Remove hedge words (seems, appears, suggests)—be definitive with data
 ✓ Pack density: every sentence adds new information
-✓ Match the voice of top-tier VC memos: sharp, substantive, opinionated
+✓ Match the voice of top-tier VC memos: sharp, substantive, analytical
 
-BAD EXAMPLE (disconnected, descriptive):
-"Market Signals examines the category positioning. The analysis shows that ${company} operates in a growing market. Funding has been raised recently."
+BAD EXAMPLE (sensational, vague):
+"Market Signals reveals a death spiral. The company faces existential threats and will fail within 18 months unless dramatic changes occur."
+
+GOOD EXAMPLE (analytical, specific):
+"Market Signals reveals subscription attachment surged 15%→50% across three years while hardware margins compressed 60%→45%, creating a 6.1:1 vs 1.8:1 LTV:CAC gap that forces a choice: defend hardware economics or accelerate the subscription migration already underway."
 
 GOOD EXAMPLE (narrative, insight-led):
 "Bulls celebrating the $15B TAM miss the creator exodus. Three thousand creators left in 2025—revealing the 10% fee creates a $2-3K/month tipping point where economics favor migration. The platform wins at the top 5% (writers earning $500K+ value simplicity over savings) while quietly losing the middle tier."
