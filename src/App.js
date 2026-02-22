@@ -279,7 +279,10 @@ async function callClaude(prompt, pdfs, signal, agentId = "signals") {
   }
   const res = await fetch("https://advisorsprint-api.vercel.app/api/claude", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { 
+      "Content-Type": "application/json",
+      "x-tool-name": "strategic-sprint"
+    },
     signal,
     body: JSON.stringify({ prompt, pdfs: pdfs.map(p => ({ name: p.name, b64: p.b64 })), agentId }),
   });
